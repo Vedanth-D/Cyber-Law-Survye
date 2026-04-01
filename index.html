@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-Contract Forgery Detection System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #080c10;
+  --surface:  #0d1117;
+  --panel:    #111820;
+  --border:   #1e2d3d;
+  --accent:   #00d4ff;
+  --accent2:  #ff4757;
+  --accent3:  #2ed573;
+  --warn:     #ffa502;
+  --text:     #c9d1d9;
+  --muted:    #586069;
+  --mono:     'Share Tech Mono', monospace;
+  --sans:     'Rajdhani', sans-serif;
+  --body:     'Inter', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden}
+
+/* GRID BACKGROUND */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.3;pointer-events:none;z-index:0}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:100;background:rgba(8,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem}
+.header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:1.5rem;height:60px}
+.logo{font-family:var(--sans);font-size:1.1rem;font-weight:700;color:var(--accent);letter-spacing:.08em;white-space:nowrap}
+.logo span{color:var(--text);font-weight:400}
+.badge{font-family:var(--mono);font-size:.65rem;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--accent);padding:.2rem .6rem;border-radius:3px;white-space:nowrap}
+
+/* NAV TABS */
+nav{display:flex;gap:.25rem;margin-left:auto}
+.tab-btn{font-family:var(--sans);font-size:.85rem;font-weight:600;letter-spacing:.06em;padding:.4rem 1rem;border-radius:4px;border:1px solid transparent;cursor:pointer;background:transparent;color:var(--muted);transition:all .2s}
+.tab-btn:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.tab-btn.active{color:var(--accent);background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.3)}
+
+/* MAIN LAYOUT */
+main{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:2rem}
+
+/* SECTION TITLES */
+.section-title{font-family:var(--sans);font-size:1.4rem;font-weight:700;letter-spacing:.06em;color:var(--accent);margin-bottom:.3rem}
+.section-sub{font-size:.82rem;color:var(--muted);margin-bottom:1.5rem}
+
+/* PANELS */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:1.5rem}
+.panel-title{font-family:var(--mono);font-size:.75rem;color:var(--accent);letter-spacing:.1em;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.panel-title::before{content:'▸';font-size:.7rem}
+
+/* GRID LAYOUTS */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+@media(max-width:1000px){.grid2,.grid3,.grid4{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+/* INPUTS */
+.field-label{font-family:var(--mono);font-size:.7rem;color:var(--muted);letter-spacing:.08em;margin-bottom:.4rem;display:block}
+textarea,input[type=text],select{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.8rem;padding:.6rem .8rem;border-radius:5px;outline:none;transition:border .2s;resize:vertical}
+textarea:focus,input[type=text]:focus,select:focus{border-color:var(--accent)}
+textarea{min-height:90px;line-height:1.6}
+select{cursor:pointer}
+
+/* BUTTONS */
+.btn{font-family:var(--sans);font-size:.85rem;font-weight:700;letter-spacing:.08em;padding:.55rem 1.4rem;border-radius:5px;border:none;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.5rem}
+.btn-primary{background:var(--accent);color:var(--bg)}
+.btn-primary:hover{background:#33ddff;transform:translateY(-1px)}
+.btn-danger {background:var(--accent2);color:#fff}
+.btn-danger:hover{background:#ff6b81}
+.btn-success{background:var(--accent3);color:var(--bg)}
+.btn-success:hover{background:#7bed9f}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+
+/* HASH DISPLAY */
+.hash-box{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:.7rem 1rem;font-family:var(--mono);font-size:.72rem;color:var(--accent);word-break:break-all;line-height:1.6;min-height:42px}
+.hash-box.danger{color:var(--accent2);border-color:rgba(255,71,87,.3)}
+.hash-box.success{color:var(--accent3);border-color:rgba(46,213,115,.3)}
+
+/* STATUS BADGES */
+.status{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.72rem;padding:.25rem .7rem;border-radius:3px;font-weight:600}
+.status.ok   {background:rgba(46,213,115,.12);color:var(--accent3);border:1px solid rgba(46,213,115,.3)}
+.status.bad  {background:rgba(255,71,87,.12); color:var(--accent2);border:1px solid rgba(255,71,87,.3)}
+.status.warn {background:rgba(255,165,2,.12); color:var(--warn);   border:1px solid rgba(255,165,2,.3)}
+.status.info {background:rgba(0,212,255,.1);  color:var(--accent); border:1px solid rgba(0,212,255,.3)}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* METRIC CARDS */
+.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1rem;text-align:center}
+.metric-val{font-family:var(--mono);font-size:1.8rem;font-weight:700;line-height:1}
+.metric-label{font-size:.72rem;color:var(--muted);margin-top:.3rem;letter-spacing:.05em}
+.metric-card.good .metric-val{color:var(--accent3)}
+.metric-card.bad  .metric-val{color:var(--accent2)}
+.metric-card.info .metric-val{color:var(--accent)}
+.metric-card.warn .metric-val{color:var(--warn)}
+
+/* DETECTOR RESULT ROW */
+.detector-row{display:flex;align-items:center;gap:.75rem;padding:.6rem .8rem;border-radius:5px;background:var(--surface);border:1px solid var(--border);margin-bottom:.5rem;transition:border .2s}
+.detector-row.flagged{border-color:rgba(255,71,87,.4)}
+.detector-row.clean{border-color:rgba(46,213,115,.2)}
+.detector-name{font-family:var(--sans);font-size:.85rem;font-weight:600;flex:1}
+.detector-detail{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+
+/* RESULT VERDICT */
+.verdict-banner{padding:1.2rem 1.5rem;border-radius:8px;display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
+.verdict-banner.forged{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.4)}
+.verdict-banner.legit{background:rgba(46,213,115,.08);border:1px solid rgba(46,213,115,.3)}
+.verdict-icon{font-size:2rem}
+.verdict-title{font-family:var(--sans);font-size:1.3rem;font-weight:700}
+.verdict-sub{font-size:.8rem;color:var(--muted)}
+
+/* FEATURE BAR CHART */
+.feature-bar-wrap{margin:.4rem 0}
+.feature-bar-label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.68rem;margin-bottom:.2rem}
+.feature-bar-track{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.feature-bar-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* COMPARISON TABLE */
+.results-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.results-table th{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.08em;padding:.5rem .8rem;border-bottom:1px solid var(--border);text-align:left;background:var(--surface)}
+.results-table td{padding:.55rem .8rem;border-bottom:1px solid rgba(30,45,61,.5);font-family:var(--mono)}
+.results-table tr:hover td{background:rgba(255,255,255,.02)}
+.results-table .dr{color:var(--accent3);font-weight:600}
+.results-table .fpr{color:var(--accent2)}
+.results-table .acc{color:var(--accent)}
+
+/* CANVAS CHARTS */
+canvas{max-width:100%;display:block}
+
+/* CONVERGENCE CHART */
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1rem}
+
+/* STEP PIPELINE */
+.pipeline{display:flex;align-items:center;gap:.3rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.pipe-step{font-family:var(--mono);font-size:.7rem;padding:.3rem .7rem;border-radius:3px;background:var(--surface);border:1px solid var(--border)}
+.pipe-step.active{background:rgba(0,212,255,.1);border-color:var(--accent);color:var(--accent)}
+.pipe-step.done{background:rgba(46,213,115,.1);border-color:var(--accent3);color:var(--accent3)}
+.pipe-arrow{color:var(--muted);font-size:.8rem}
+
+/* SPINNER */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,212,255,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* HMM PATH */
+.state-path{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem}
+.state-node{font-family:var(--mono);font-size:.65rem;padding:.25rem .5rem;border-radius:3px;border:1px solid var(--border);background:var(--surface)}
+.state-node.anomalous{border-color:var(--accent2);color:var(--accent2);background:rgba(255,71,87,.08)}
+
+/* DIFF VIEWER */
+.diff-view{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:.8rem;font-family:var(--mono);font-size:.72rem;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto;line-height:1.7}
+.diff-original{color:var(--accent3)}
+.diff-padding{color:var(--warn)}
+.diff-malicious{color:var(--accent2)}
+
+/* TABS */
+.tab-content{display:none}
+.tab-content.active{display:block;animation:fadein .25s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* SEPARATOR */
+.sep{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
+
+/* TOGGLE */
+.toggle-wrap{display:flex;align-items:center;gap:.8rem}
+.toggle{position:relative;width:44px;height:24px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:12px;cursor:pointer;transition:.3s}
+.toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:var(--muted);border-radius:50%;transition:.3s}
+.toggle input:checked+.toggle-slider{background:rgba(0,212,255,.3)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(20px);background:var(--accent)}
+.toggle-label{font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">E-CONTRACT<span> FORGERY DETECTION</span></div>
+    <div class="badge">JAIN DEEMED-TO-BE UNIVERSITY · CSE · 2024-25</div>
+    <nav>
+      <button class="tab-btn active" onclick="showTab('tab-attack')">⚡ Attack Lab</button>
+      <button class="tab-btn" onclick="showTab('tab-detect')">🔍 Detector</button>
+      <button class="tab-btn" onclick="showTab('tab-optimize')">⚙ Optimizer</button>
+      <button class="tab-btn" onclick="showTab('tab-evaluate')">📊 Evaluation</button>
+      <button class="tab-btn" onclick="showTab('tab-about')">📄 About</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════════ TAB 1: ATTACK -->
+<div id="tab-attack" class="tab-content active">
+  <div class="section-title">⚡ Length-Extension Attack Laboratory</div>
+  <div class="section-sub">Demonstrates SHA-256 Merkle-Damgård vulnerability vs HMAC defense — Section IV.A–B of the paper</div>
+
+  <div class="grid2" style="margin-bottom:1.5rem">
+    <!-- Sign Contract -->
+    <div class="panel">
+      <div class="panel-title">STEP 1 — SIGN ORIGINAL CONTRACT</div>
+
+      <div class="toggle-wrap" style="margin-bottom:1rem">
+        <label class="toggle"><input type="checkbox" id="secureMode" onchange="updateModeLabel()"><span class="toggle-slider"></span></label>
+        <span class="toggle-label" id="modeLabel">INSECURE: SHA-256(secret||contract)</span>
+      </div>
+
+      <label class="field-label">CONTRACT TEXT</label>
+      <textarea id="contractInput" rows="6">CONTRACT_ID: EC-2024-0042
+PARTIES: Alpha Corp, Beta Ltd
+PAYMENT: INR 10,00,000
+JURISDICTION: Bangalore, India
+GOVERNING LAW: Karnataka, India
+DATE: 2024-12-01</textarea>
+
+      <div style="margin-top:.8rem;display:flex;gap:.6rem">
+        <button class="btn btn-primary" onclick="signContract()">Sign Contract</button>
+        <button class="btn btn-ghost" onclick="loadSampleContract()">Load Sample</button>
+      </div>
+
+      <div style="margin-top:1rem">
+        <label class="field-label">SIGNATURE (HEX)</label>
+        <div class="hash-box" id="signatureDisplay">— awaiting signing —</div>
+      </div>
+      <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center" id="signStatus"></div>
+    </div>
+
+    <!-- Attack Panel -->
+    <div class="panel">
+      <div class="panel-title">STEP 2 — FORGE WITH LENGTH-EXTENSION</div>
+
+      <label class="field-label">MALICIOUS CLAUSE TO APPEND</label>
+      <textarea id="maliciousInput" rows="4">
+AMENDMENT_01: Payment amount changed to INR 1,00,00,000
+AMENDMENT_02: Jurisdiction changed to Offshore Territory
+BENEFICIARY: Account XXXX-9999 (Attacker Controlled)</textarea>
+
+      <div style="margin-top:.8rem">
+        <button class="btn btn-danger" id="attackBtn" onclick="runAttack()" disabled>⚡ Execute Attack</button>
+      </div>
+
+      <div style="margin-top:1rem" id="attackStats" style="display:none">
+        <div class="grid4" style="gap:.6rem">
+          <div class="metric-card bad"><div class="metric-val" id="mOrigLen">—</div><div class="metric-label">ORIGINAL BYTES</div></div>
+          <div class="metric-card warn"><div class="metric-val" id="mPadLen">—</div><div class="metric-label">PADDING BYTES</div></div>
+          <div class="metric-card bad"><div class="metric-val" id="mExtLen">—</div><div class="metric-label">EXTENSION BYTES</div></div>
+          <div class="metric-card info"><div class="metric-val" id="mForgedLen">—</div><div class="metric-label">FORGED BYTES</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attack Results -->
+  <div id="attackResults" style="display:none">
+    <div class="panel">
+      <div class="panel-title">ATTACK RESULTS</div>
+
+      <div id="verdictBanner" class="verdict-banner forged" style="display:none">
+        <div class="verdict-icon">⚠️</div>
+        <div>
+          <div class="verdict-title" id="verdictTitle">FORGERY SUCCESSFUL</div>
+          <div class="verdict-sub" id="verdictSub"></div>
+        </div>
+        <div style="margin-left:auto" id="verdictBadge"></div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label class="field-label">ORIGINAL SIGNATURE</label>
+          <div class="hash-box success" id="origSigDisplay">—</div>
+          <label class="field-label" style="margin-top:.8rem">FORGED SIGNATURE</label>
+          <div class="hash-box danger" id="forgedSigDisplay">—</div>
+          <div style="margin-top:.6rem;font-family:var(--mono);font-size:.68rem;color:var(--muted)" id="sigCompare"></div>
+        </div>
+        <div>
+          <label class="field-label">FORGED CONTRACT STRUCTURE</label>
+          <div class="diff-view" id="diffView">—</div>
+          <div style="margin-top:.5rem;display:flex;gap:.6rem;flex-wrap:wrap" id="attackBadges"></div>
+        </div>
+      </div>
+
+      <hr class="sep">
+
+      <div>
+        <label class="field-label">MD PADDING HEX (injected between original and malicious clause)</label>
+        <div class="hash-box" id="paddingHex" style="color:var(--warn);max-height:60px;overflow:auto">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ TAB 2: DETECT -->
+<div id="tab-detect" class="tab-content">
+  <div class="section-title">🔍 Multi-Layer Forgery Detector</div>
+  <div class="section-sub">5 detectors run in parallel: Static Threshold · Entropy Anomaly · Random Forest · LSTM Autoencoder · HMM State Analyzer</div>
+
+  <div class="grid2" style="margin-bottom:1.5rem">
+    <div class="panel">
+      <div class="panel-title">CONTRACT SUBMISSION</div>
+      <label class="field-label">PASTE CONTRACT TO ANALYZE</label>
+      <textarea id="detectContractInput" rows="8">CONTRACT_ID: EC-2024-0042
+PARTIES: Alpha Corp, Beta Ltd
+PAYMENT: INR 10,00,000
+JURISDICTION: Bangalore, India
+GOVERNING LAW: Karnataka, India
+DATE: 2024-12-01</textarea>
+      <label class="field-label" style="margin-top:.8rem">SIGNATURE (leave blank to auto-compute)</label>
+      <input type="text" id="detectSigInput" placeholder="Optional: paste hex signature">
+      <div style="margin-top:.8rem;display:flex;gap:.6rem">
+        <button class="btn btn-primary" onclick="runDetection()">🔍 Analyze Contract</button>
+        <button class="btn btn-ghost" onclick="loadForgedSample()">Load Forged Sample</button>
+        <button class="btn btn-ghost" onclick="loadLegitSample()">Load Legit Sample</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">EXTRACTED FEATURES</div>
+      <div id="featureBars"><div style="color:var(--muted);font-family:var(--mono);font-size:.75rem">Submit a contract to see features</div></div>
+    </div>
+  </div>
+
+  <div id="detectionResults" style="display:none">
+    <!-- Verdict -->
+    <div id="detectionVerdict" class="verdict-banner forged" style="margin-bottom:1.5rem">
+      <div class="verdict-icon" id="detVerdictIcon">⚠️</div>
+      <div>
+        <div class="verdict-title" id="detVerdictTitle">—</div>
+        <div class="verdict-sub" id="detVerdictSub">—</div>
+      </div>
+      <div style="margin-left:auto">
+        <div class="metric-card info" style="min-width:100px">
+          <div class="metric-val" id="detConfidence">—</div>
+          <div class="metric-label">CONFIDENCE</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detector rows -->
+    <div class="panel" style="margin-bottom:1.5rem">
+      <div class="panel-title">DETECTOR VERDICTS</div>
+      <div id="detectorRows"></div>
+    </div>
+
+    <!-- HMM state path -->
+    <div class="panel">
+      <div class="panel-title">HMM STATE PATH (VITERBI DECODING)</div>
+      <div style="font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-bottom:.5rem">Observations →</div>
+      <div id="hmmObsPath" class="state-path"></div>
+      <div style="font-family:var(--mono);font-size:.72rem;color:var(--muted);margin:.8rem 0 .5rem">Decoded States →</div>
+      <div id="hmmStatePath" class="state-path"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ TAB 3: OPTIMIZER -->
+<div id="tab-optimize" class="tab-content">
+  <div class="section-title">⚙ Metaheuristic Threshold Optimizer</div>
+  <div class="section-sub">PSO vs GWO — Fitness: F(θ) = w₁·DR(θ) − w₂·FPR(θ) − w₃·Cost(θ) — Section IV.D of the paper</div>
+
+  <div class="grid2" style="margin-bottom:1.5rem">
+    <div class="panel">
+      <div class="panel-title">OPTIMIZER SETTINGS</div>
+      <div class="grid2" style="gap:.8rem">
+        <div>
+          <label class="field-label">ALGORITHM</label>
+          <select id="optAlgo">
+            <option value="pso">PSO — Particle Swarm</option>
+            <option value="gwo">GWO — Grey Wolf</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">ITERATIONS</label>
+          <select id="optIter">
+            <option value="40">40</option>
+            <option value="80" selected>80</option>
+            <option value="120">120</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:1rem;font-family:var(--mono);font-size:.72rem;color:var(--muted);line-height:1.7">
+        Weights: w₁=0.6 (DR) · w₂=0.3 (FPR) · w₃=0.1 (Cost)<br>
+        Bounds: θ ∈ [0, 1] · Particles/Wolves: 30
+      </div>
+      <button class="btn btn-primary" style="margin-top:1rem" onclick="runOptimizer()" id="optBtn">▶ Run Optimizer</button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">OPTIMAL RESULT</div>
+      <div class="grid2" style="gap:.6rem" id="optResults">
+        <div class="metric-card info"><div class="metric-val" id="optThreshold">—</div><div class="metric-label">BEST THRESHOLD</div></div>
+        <div class="metric-card info"><div class="metric-val" id="optFitness">—</div><div class="metric-label">FITNESS SCORE</div></div>
+        <div class="metric-card good"><div class="metric-val" id="optDR">—</div><div class="metric-label">DETECTION RATE</div></div>
+        <div class="metric-card bad"><div class="metric-val" id="optFPR">—</div><div class="metric-label">FALSE POSITIVE</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">CONVERGENCE CURVE</div>
+    <div class="chart-wrap">
+      <canvas id="convergenceChart" height="220"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ TAB 4: EVALUATE -->
+<div id="tab-evaluate" class="tab-content">
+  <div class="section-title">📊 Full Comparative Evaluation</div>
+  <div class="section-sub">All 6 detectors evaluated on 1000 synthetic contracts (500 legit + 500 forged) — Table II, Section VI</div>
+
+  <div style="margin-bottom:1.5rem">
+    <button class="btn btn-primary" id="evalBtn" onclick="runEvaluation()">▶ Run Full Evaluation</button>
+    <span style="margin-left:1rem;font-family:var(--mono);font-size:.72rem;color:var(--muted)">Trains all models, evaluates on holdout test set</span>
+  </div>
+
+  <div id="evalResults" style="display:none">
+    <div class="grid4" style="margin-bottom:1.5rem" id="evalMetricCards"></div>
+
+    <div class="panel" style="margin-bottom:1.5rem">
+      <div class="panel-title">DETECTOR COMPARISON TABLE</div>
+      <table class="results-table" id="evalTable">
+        <thead><tr><th>METHOD</th><th>DR%</th><th>FPR%</th><th>ACC%</th><th>TP</th><th>FP</th><th>FN</th><th>TN</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="grid2">
+      <div class="panel">
+        <div class="panel-title">DR vs FPR TRADEOFF</div>
+        <div class="chart-wrap"><canvas id="drFprChart" height="260"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">FEATURE IMPORTANCE (Random Forest)</div>
+        <div id="featureImportanceBars"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ TAB 5: ABOUT -->
+<div id="tab-about" class="tab-content">
+  <div class="section-title">📄 Paper Reference</div>
+  <div class="section-sub">Cryptographic Forgery in E-Contracts: A Survey of Metaheuristic Length-Extension Attacks</div>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="panel-title">PAPER DETAILS</div>
+      <div style="font-family:var(--body);font-size:.88rem;line-height:1.9;color:var(--text)">
+        <p><strong style="color:var(--accent)">Title:</strong> Cryptographic Forgery in E-Contracts: A Survey of Metaheuristic Length-Extension Attacks</p>
+        <p style="margin-top:.6rem"><strong style="color:var(--accent)">Authors:</strong> Arjun Krishnamurthy, Divya Raghavan, Santhosh Pillai</p>
+        <p style="margin-top:.6rem"><strong style="color:var(--accent)">Institution:</strong> JAIN Deemed-to-be University, Dept. CSE, Bangalore</p>
+        <p style="margin-top:.6rem"><strong style="color:var(--accent)">Year:</strong> 2024-25 | Theme 9 | Cyber Law Survey</p>
+        <p style="margin-top:.6rem"><strong style="color:var(--accent)">Methodology:</strong> PRISMA SLR — 51 peer-reviewed papers (2019–2025)</p>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">TAXONOMY COVERAGE</div>
+      <div style="font-family:var(--mono);font-size:.75rem;line-height:2.1;color:var(--text)">
+        <div style="color:var(--accent)">A. Protocol-Level Hardening</div>
+        <div style="padding-left:1rem;color:var(--muted)">A1. HMAC mandate · A2. Signature upgrade · A3. Payload binding</div>
+        <div style="color:var(--accent);margin-top:.4rem">B. Hash Integrity Monitoring</div>
+        <div style="padding-left:1rem;color:var(--muted)">B1. Static Threshold · B2c. Entropy Anomaly · B2d. HMM State</div>
+        <div style="color:var(--accent);margin-top:.4rem">C. ML-Based Forgery Detection</div>
+        <div style="padding-left:1rem;color:var(--muted)">C1. SVM/RF · C2. LSTM Autoencoder · C3. Federated Learning</div>
+        <div style="color:var(--warn);margin-top:.4rem">Optimization</div>
+        <div style="padding-left:1rem;color:var(--muted)">PSO (Kennedy & Eberhart) · GWO (Mirjalili et al.)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:1.5rem">
+    <div class="panel-title">MODULE → SECTION MAPPING</div>
+    <div class="grid3" style="gap:1rem">
+      <div style="font-family:var(--mono);font-size:.72rem;line-height:1.9">
+        <div style="color:var(--accent)">Module 1</div>
+        <div style="color:var(--muted)">Length-Extension Attack</div>
+        <div>→ Section IV.A–B</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:.72rem;line-height:1.9">
+        <div style="color:var(--accent)">Module 2</div>
+        <div style="color:var(--muted)">Feature Extraction + Entropy Detector</div>
+        <div>→ Section IV.C, Taxonomy B</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:.72rem;line-height:1.9">
+        <div style="color:var(--accent)">Module 3</div>
+        <div style="color:var(--muted)">PSO + GWO Optimizer</div>
+        <div>→ Section IV.D, Table III</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:.72rem;line-height:1.9">
+        <div style="color:var(--accent)">Module 4</div>
+        <div style="color:var(--muted)">LSTM Autoencoder</div>
+        <div>→ Section IV.E, Table II</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:.72rem;line-height:1.9">
+        <div style="color:var(--accent)">Module 5</div>
+        <div style="color:var(--muted)">HMM State Analyzer</div>
+        <div>→ Section IV.G, Taxonomy B2d</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:.72rem;line-height:1.9">
+        <div style="color:var(--accent)">Module 6</div>
+        <div style="color:var(--muted)">Full Evaluation Pipeline</div>
+        <div>→ Section VI, Table II</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ── Tab system ────────────────────────────────────────────────────────────────
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const idx = ['tab-attack','tab-detect','tab-optimize','tab-evaluate','tab-about'].indexOf(id);
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+let currentSignature = '';
+let currentMode = 'vulnerable';
+let convergenceChart = null;
+let drFprChart = null;
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function el(id) { return document.getElementById(id); }
+function setHTML(id, html) { el(id).innerHTML = html; }
+function setText(id, text) { el(id).textContent = text; }
+function show(id) { el(id).style.display=''; }
+function hide(id) { el(id).style.display='none'; }
+
+async function api(endpoint, method='GET', body=null) {
+  const opts = { method, headers: {'Content-Type':'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(endpoint, opts);
+  return r.json();
+}
+
+function updateModeLabel() {
+  const secure = el('secureMode').checked;
+  currentMode = secure ? 'secure' : 'vulnerable';
+  el('modeLabel').textContent = secure
+    ? 'SECURE: HMAC-SHA256(secret, contract)'
+    : 'INSECURE: SHA-256(secret||contract)';
+}
+
+// ── TAB 1: Attack ─────────────────────────────────────────────────────────────
+async function signContract() {
+  const contract = el('contractInput').value.trim();
+  if (!contract) return;
+  const mode = el('secureMode').checked ? 'secure' : 'vulnerable';
+  const res = await api('/api/sign','POST',{contract, mode});
+  currentSignature = res.signature;
+  currentMode = mode;
+  el('signatureDisplay').textContent = res.signature;
+  el('signatureDisplay').className = 'hash-box ' + (mode==='vulnerable'?'danger':'success');
+  el('signStatus').innerHTML = `<span class="status ${mode==='vulnerable'?'bad':'ok'}"><span class="dot"></span>${mode==='vulnerable'?'VULNERABLE (SHA-256)':'SECURE (HMAC-SHA256)'}</span><span style="font-family:var(--mono);font-size:.68rem;color:var(--muted);margin-left:.6rem">${res.contract_length} bytes · ${res.algorithm}</span>`;
+  el('attackBtn').disabled = false;
+}
+
+function loadSampleContract() {
+  el('contractInput').value = `CONTRACT_ID: EC-2024-0042\nPARTIES: Alpha Corp, Beta Ltd\nPAYMENT: INR 10,00,000\nJURISDICTION: Bangalore, India\nGOVERNING LAW: Karnataka, India\nDATE: 2024-12-01`;
+}
+
+async function runAttack() {
+  const contract  = el('contractInput').value.trim();
+  const malicious = el('maliciousInput').value.trim();
+  if (!contract || !currentSignature) return;
+  const res = await api('/api/attack','POST',{contract, signature: currentSignature, malicious});
+
+  // Stats
+  setText('mOrigLen', res.original_length);
+  setText('mPadLen',  res.padding_length);
+  setText('mExtLen',  res.malicious_length);
+  setText('mForgedLen',res.forged_length);
+  show('attackStats');
+
+  // Signatures
+  setText('origSigDisplay',  res.original_signature);
+  setText('forgedSigDisplay', res.forged_signature);
+  el('sigCompare').textContent = res.signatures_differ
+    ? `Signatures differ: YES — extension produced new hash state (elapsed: ${res.elapsed_ms}ms)`
+    : 'Signatures identical';
+
+  // Diff view
+  el('diffView').innerHTML =
+    `<span class="diff-original">${escHtml(res.original_contract_text)}</span>` +
+    `<span class="diff-padding">[MD-PADDING: ${res.padding_length} bytes of 0x00/0x80 structural bytes]</span>` +
+    `<span class="diff-malicious">${escHtml(res.malicious_text)}</span>`;
+
+  // Padding hex
+  setText('paddingHex', res.padding_hex);
+
+  // Verdict
+  const vulnPass = res.forged_passes_vulnerable;
+  const hmacPass = res.forged_passes_hmac;
+  el('verdictBanner').style.display = '';
+  el('verdictBanner').className = 'verdict-banner ' + (vulnPass ? 'forged' : 'legit');
+  setText('verdictTitle', vulnPass ? '⚠ FORGERY ACCEPTED BY VULNERABLE SYSTEM' : 'FORGERY REJECTED');
+  setText('verdictSub',   `Vulnerable check: ${vulnPass?'PASS (attack succeeded!)':'FAIL'} | HMAC check: ${hmacPass?'PASS':'FAIL (HMAC immune)'}`);
+  el('verdictBadge').innerHTML =
+    `<span class="status ${vulnPass?'bad':'ok'}">${vulnPass?'FORGERY SUCCESS':'FORGERY BLOCKED'}</span>`;
+
+  el('attackBadges').innerHTML =
+    `<span class="status ${vulnPass?'bad':'ok'}">Vulnerable: ${vulnPass?'ACCEPTED':'REJECTED'}</span>` +
+    `<span class="status ${hmacPass?'bad':'ok'}">HMAC: ${hmacPass?'ACCEPTED':'REJECTED'}</span>`;
+
+  show('attackResults');
+}
+
+// ── TAB 2: Detect ─────────────────────────────────────────────────────────────
+async function runDetection() {
+  const contract  = el('detectContractInput').value.trim();
+  const signature = el('detectSigInput').value.trim();
+  if (!contract) return;
+
+  const res = await api('/api/detect','POST',{contract, signature});
+
+  // Feature bars
+  const feats = res.features;
+  const featMeta = {
+    payload_length:  {max:1000, label:'Payload Length (bytes)', warn:600},
+    entropy:         {max:6,    label:'Shannon Entropy', warn:null},
+    padding_entropy: {max:6,    label:'Padding Region Entropy', warn:3.0},
+    null_byte_ratio: {max:0.5,  label:'Null Byte Ratio', warn:0.10},
+    high_byte_ratio: {max:0.5,  label:'High Byte Ratio (≥0x80)', warn:0.10},
+    block_boundary:  {max:1,    label:'Block Boundary Flag', warn:null},
+    length_mod_64:   {max:64,   label:'Length mod 64', warn:null},
+    hash_entropy:    {max:5,    label:'Hash Hex Entropy', warn:null},
+  };
+  let barsHTML = '';
+  for (const [key, meta] of Object.entries(featMeta)) {
+    const v = feats[key] || 0;
+    const pct = Math.min(100, (v/meta.max)*100);
+    const color = (meta.warn && v > meta.warn) ? 'var(--accent2)' : 'var(--accent)';
+    barsHTML += `<div class="feature-bar-wrap">
+      <div class="feature-bar-label"><span>${meta.label}</span><span>${typeof v==='number'?v.toFixed(4):v}</span></div>
+      <div class="feature-bar-track"><div class="feature-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
+  }
+  setHTML('featureBars', barsHTML);
+
+  // Verdict
+  const isForged = res.overall === 'FORGED';
+  el('detectionVerdict').className = 'verdict-banner ' + (isForged?'forged':'legit');
+  setText('detVerdictIcon',  isForged ? '⚠️' : '✅');
+  setText('detVerdictTitle', isForged ? '⚠ CONTRACT FLAGGED AS FORGED' : '✓ CONTRACT APPEARS LEGITIMATE');
+  setText('detVerdictSub',   `${res.votes}/5 detectors flagged anomaly | Confidence: ${res.confidence}%`);
+  setText('detConfidence', res.confidence + '%');
+  el('detConfidence').parentElement.className = 'metric-card ' + (isForged ? 'bad' : 'good');
+
+  // Detector rows
+  const dnames = {
+    static_threshold: 'Static Threshold (B1)',
+    entropy_anomaly:  'Entropy Anomaly Detector (B2c)',
+    random_forest:    'Random Forest (C1)',
+    lstm_autoencoder: 'LSTM Autoencoder (C2)',
+    hmm_state:        'HMM State Analyzer (B2d)',
+  };
+  let rowsHTML = '';
+  for (const [key, det] of Object.entries(res.detectors)) {
+    const flagged = det.flag;
+    const detail = det.reason || (det.probability!=null?`P(forged)=${det.probability}`:det.reconstruction_error!=null?`err=${det.reconstruction_error} / θ=${det.threshold}`:det.log_likelihood!=null?`LL=${det.log_likelihood}`:'');
+    rowsHTML += `<div class="detector-row ${flagged?'flagged':'clean'}">
+      <span class="status ${flagged?'bad':'ok'}"><span class="dot"></span>${flagged?'FLAGGED':'CLEAN'}</span>
+      <span class="detector-name">${dnames[key]||key}</span>
+      <span class="detector-detail">${detail}</span>
+    </div>`;
+  }
+  setHTML('detectorRows', rowsHTML);
+
+  // HMM paths
+  const hmm = res.detectors.hmm_state;
+  if (hmm) {
+    setHTML('hmmObsPath', hmm.observations.map(o=>`<span class="state-node">${o}</span>`).join('<span class="pipe-arrow">→</span>'));
+    setHTML('hmmStatePath', hmm.state_path.map(s=>`<span class="state-node ${s.includes('EXTENSION')?'anomalous':''}">${s}</span>`).join('<span class="pipe-arrow">→</span>'));
+  }
+
+  show('detectionResults');
+}
+
+function loadForgedSample() {
+  el('detectContractInput').value =
+    `CONTRACT_ID: EC-2024-0042\nPARTIES: Alpha Corp, Beta Ltd\nPAYMENT: INR 10,00,000\nJURISDICTION: Bangalore, India\nDATE: 2024-12-01` +
+    `\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00` +
+    `\nAMENDMENT: Amount changed to INR 1,00,00,000\nBENEFICIARY: XXXX-9999\n`;
+  el('detectSigInput').value = '';
+}
+function loadLegitSample() {
+  el('detectContractInput').value = `CONTRACT_ID: EC-2024-0088\nPARTIES: Gamma Inc, Delta Co\nPAYMENT: INR 5,50,000\nJURISDICTION: Mumbai, India\nDATE: 2024-11-15`;
+  el('detectSigInput').value = '';
+}
+
+// ── TAB 3: Optimizer ──────────────────────────────────────────────────────────
+async function runOptimizer() {
+  el('optBtn').disabled = true;
+  el('optBtn').innerHTML = '<span class="spinner"></span> Running...';
+  const algo  = el('optAlgo').value;
+  const niter = parseInt(el('optIter').value);
+  const res = await api('/api/optimize','POST',{algorithm:algo, n_iter:niter});
+
+  setText('optThreshold', res.best_threshold);
+  setText('optFitness',   res.best_fitness);
+  setText('optDR',   res.DR + '%');
+  setText('optFPR',  res.FPR + '%');
+
+  drawConvergenceChart(res.history, res.convergence_points, res.algorithm);
+
+  el('optBtn').disabled = false;
+  el('optBtn').innerHTML = '▶ Run Optimizer';
+}
+
+function drawConvergenceChart(history, points, label) {
+  const canvas = el('convergenceChart');
+  const ctx = canvas.getContext('2d');
+  canvas.width  = canvas.parentElement.offsetWidth - 32;
+  canvas.height = 220;
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // Background
+  ctx.fillStyle='#0d1117'; ctx.fillRect(0,0,W,H);
+
+  // Grid
+  ctx.strokeStyle='#1e2d3d'; ctx.lineWidth=1;
+  for (let i=0;i<=5;i++){
+    const y=H*.1+(H*.8)*(i/5);
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+
+  if (!history.length) return;
+  const mn=Math.min(...history), mx=Math.max(...history);
+  const pad=20, pw=W-2*pad, ph=H*.8;
+  const toX=i=>pad+pw*(i/(history.length-1||1));
+  const toY=v=>H*.9-ph*((v-mn)/(mx-mn+.0001));
+
+  // Gradient fill
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'rgba(0,212,255,.25)'); grad.addColorStop(1,'rgba(0,212,255,0)');
+  ctx.beginPath(); ctx.moveTo(toX(0),toY(history[0]));
+  history.forEach((v,i)=>ctx.lineTo(toX(i),toY(v)));
+  ctx.lineTo(toX(history.length-1),H); ctx.lineTo(toX(0),H); ctx.closePath();
+  ctx.fillStyle=grad; ctx.fill();
+
+  // Line
+  ctx.beginPath(); ctx.strokeStyle='#00d4ff'; ctx.lineWidth=2;
+  history.forEach((v,i)=>i===0?ctx.moveTo(toX(i),toY(v)):ctx.lineTo(toX(i),toY(v)));
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle='#586069'; ctx.font='11px Share Tech Mono';
+  ctx.fillText(`${label} Convergence`,pad,18);
+  ctx.fillText(`Final: ${history[history.length-1].toFixed(4)}`,W-110,18);
+}
+
+// ── TAB 4: Evaluate ──────────────────────────────────────────────────────────
+async function runEvaluation() {
+  el('evalBtn').disabled=true;
+  el('evalBtn').innerHTML='<span class="spinner"></span> Evaluating all models...';
+  const res = await api('/api/evaluate');
+
+  // Best detector
+  const best = res.results.reduce((a,b)=>b.DR>a.DR?b:a, res.results[0]||{DR:0});
+  setHTML('evalMetricCards',
+    `<div class="metric-card info"><div class="metric-val">${res.results.length}</div><div class="metric-label">DETECTORS</div></div>
+     <div class="metric-card good"><div class="metric-val">${best.DR}%</div><div class="metric-label">BEST DR</div></div>
+     <div class="metric-card warn"><div class="metric-val">${res.dataset_info.n_train}</div><div class="metric-label">TRAIN SAMPLES</div></div>
+     <div class="metric-card info"><div class="metric-val">${res.dataset_info.n_test}</div><div class="metric-label">TEST SAMPLES</div></div>`
+  );
+
+  // Table
+  const tbody = el('evalTable').querySelector('tbody');
+  tbody.innerHTML = '';
+  res.results.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.name}</td><td class="dr">${r.DR}</td><td class="fpr">${r.FPR}</td><td class="acc">${r.Acc}</td><td>${r.TP}</td><td>${r.FP}</td><td>${r.FN}</td><td>${r.TN}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // DR/FPR chart
+  drawDRFPRChart(res.results);
+
+  // Feature importance
+  if (res.feature_importance) {
+    let impHTML='';
+    res.feature_importance.forEach(f=>{
+      impHTML+=`<div class="feature-bar-wrap">
+        <div class="feature-bar-label"><span>${f.feature}</span><span>${f.importance}%</span></div>
+        <div class="feature-bar-track"><div class="feature-bar-fill" style="width:${f.importance}%;background:var(--accent)"></div></div>
+      </div>`;
+    });
+    setHTML('featureImportanceBars', impHTML);
+  }
+
+  show('evalResults');
+  el('evalBtn').disabled=false;
+  el('evalBtn').innerHTML='▶ Run Full Evaluation';
+}
+
+function drawDRFPRChart(results) {
+  const canvas = el('drFprChart');
+  const ctx = canvas.getContext('2d');
+  canvas.width  = canvas.parentElement.offsetWidth - 32;
+  canvas.height = 260;
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0d1117'; ctx.fillRect(0,0,W,H);
+
+  // Axes
+  const pad=45, pw=W-2*pad, ph=H-2*pad;
+  ctx.strokeStyle='#1e2d3d'; ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){
+    const y=pad+ph*(i/5);
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke();
+    const x=pad+pw*(i/5);
+    ctx.beginPath(); ctx.moveTo(x,pad); ctx.lineTo(x,H-pad); ctx.stroke();
+  }
+
+  // Axis labels
+  ctx.fillStyle='#586069'; ctx.font='10px Share Tech Mono';
+  ctx.fillText('FPR %', W/2-15, H-5);
+  ctx.save(); ctx.translate(12,H/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('DR %', 0, 0); ctx.restore();
+
+  const colors=['#00d4ff','#2ed573','#ffa502','#ff4757','#a29bfe','#fd79a8'];
+
+  results.forEach((r,i)=>{
+    const x = pad + pw*(r.FPR/20);
+    const y = pad + ph*(1 - r.DR/100);
+    ctx.beginPath();
+    ctx.arc(x,y,6,0,Math.PI*2);
+    ctx.fillStyle=colors[i%colors.length];
+    ctx.fill();
+    ctx.fillStyle=colors[i%colors.length];
+    ctx.font='9px Share Tech Mono';
+    const shortName = r.name.split(' ')[0];
+    ctx.fillText(shortName, x+8, y+3);
+  });
+
+  // Axis tick labels
+  ctx.fillStyle='#586069'; ctx.font='9px Share Tech Mono';
+  for(let i=0;i<=5;i++){
+    ctx.fillText((i*4)+'%', pad+pw*(i/5)-8, H-pad+14);
+    ctx.fillText((100-i*20)+'%', pad-30, pad+ph*(i/5)+3);
+  }
+}
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  updateModeLabel();
+});
+</script>
+</body>
+</html>
