@@ -154,7 +154,7 @@ PSO/GWO Optimization             Module 3
 ---
 
 ## Authors
-Arjun Krishnamurthy, Divya Raghavan, Santhosh Pillai  
-Department of Computer Science and Engineering  
+Vedanth D , Mursalin Pasha M.
+Department of Computer Science and Engineering 
 JAIN Deemed-to-be University, Bangalore, India  
-Academic Year 2024–25
+Academic Year 2025–2026
