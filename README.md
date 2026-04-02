@@ -1,160 +1,297 @@
-# Source Code Package
-## Cryptographic Forgery in E-Contracts: A Survey of Metaheuristic Length-Extension Attacks
-### JAIN Deemed-to-be University | Dept. of CSE | Cyber Law Survey 2024-25
+# 🔐 Cryptographic Forgery in E-Contracts
+### A Survey-Based Implementation of Metaheuristic Length-Extension Attack Detection
+
+![Python](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python)
+![Flask](https://img.shields.io/badge/Flask-Backend-black?style=for-the-badge&logo=flask)
+![ML](https://img.shields.io/badge/ML-RandomForest-green?style=for-the-badge&logo=scikit-learn)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
 ---
 
-## Overview
+## 📌 About This Project
 
-This package contains the complete source code implementation supporting the survey paper.
-All modules are self-contained pure Python (NumPy only) — no deep learning framework required.
+This project is a **full-stack working implementation** based on our survey paper:
+
+> **"Cryptographic Forgery in E-Contracts: A Survey of Metaheuristic Length-Extension Attacks"**
+> Department of Computer Science and Engineering, JAIN Deemed-to-be University, Bangalore, India
+
+The system demonstrates how **hash length-extension attacks** work on electronic contracts,
+how **Simulated Annealing (metaheuristic optimization)** is used to guess secret key lengths,
+and how a **Random Forest ML classifier** detects forged contract payloads — all through a
+dark-themed interactive security dashboard.
 
 ---
 
-## File Structure
+## 🤖 AI Tools Used in This Project
+
+This project was built using a combination of AI assistants, each contributing to different parts of the work.
+
+---
+
+### 🟠 Claude (Anthropic) — Code Implementation
+**Used for:** All code generation, system architecture, and full-stack development
+
+Claude was used to write every line of code in this project including:
+
+- `app.py` — Flask backend with all REST API endpoints
+- `detector.py` — Core cryptographic logic, Simulated Annealing optimizer, Random Forest ML model, feature extraction pipeline
+- `templates/index.html` — Complete dark-themed security dashboard frontend with HTML, CSS, and JavaScript
+- Debugging and fixing all runtime errors (405 Method Not Allowed, 500 template errors, CORS issues)
+- Designing the 8-feature ML detection pipeline
+- Writing the SA convergence loop and MD padding calculator
+
+> **Claude was the primary coding assistant for this entire project.**
+> Model used: Claude Sonnet (claude.ai)
+
+---
+
+### 🔵 Google Gemini — Research Assistance
+**Used for:** Literature search, paper summaries, and content structuring
+
+Gemini was used to:
+
+- Search and summarize academic papers related to hash length-extension attacks
+- Explain the Merkle–Damgård construction in simple terms
+- Find recent papers (2020–2025) from IEEE, ACM, and ScienceDirect
+- Suggest relevant legal frameworks (GDPR, IT Act 2000, UNCITRAL)
+- Help understand how Simulated Annealing applies to cryptographic search problems
+- Summarize papers that were behind paywalls
+
+> Model used: Gemini 1.5 Pro (gemini.google.com)
+
+---
+
+### 🟢 ChatGPT (OpenAI) — Survey Paper Writing & Explanation
+**Used for:** Writing sections of the survey paper and explaining concepts
+
+ChatGPT was used to:
+
+- Draft and refine sections of the survey paper (Abstract, Introduction, Problem Statement)
+- Explain cryptographic concepts in plain language for the presentation
+- Suggest the structure of the PRISMA-based literature review
+- Write the comparative analysis narrative for Table II
+- Help phrase the legal-technical mapping section (GDPR Articles, IT Act Sections)
+- Proofread and improve academic writing quality
+
+> Model used: ChatGPT-4o (chat.openai.com)
+
+---
+
+### 🟡 Summary of AI Contributions
+
+| Task | Tool Used |
+|------|-----------|
+| All backend Python code | Claude (Anthropic) |
+| All frontend HTML/CSS/JS | Claude (Anthropic) |
+| Bug fixing & debugging | Claude (Anthropic) |
+| System architecture design | Claude (Anthropic) |
+| Literature search & paper summaries | Google Gemini |
+| Finding IEEE/ACM papers | Google Gemini |
+| Survey paper writing | ChatGPT (OpenAI) |
+| Academic language & proofreading | ChatGPT (OpenAI) |
+| Concept explanations for PPT | ChatGPT (OpenAI) |
+| Research topic ideation | All three tools |
+
+---
+
+## 🧠 What the System Does
+
+### Core Concepts from the Survey Paper
+
+| Concept | What It Means | Where in Code |
+|---------|--------------|---------------|
+| Hash Length-Extension Attack | Appending data to a signed contract without knowing the secret key | `detector.py → length_extension_attack()` |
+| Merkle–Damgård Vulnerability | SHA-256/MD5/SHA-1 internal state can be resumed by attacker | `detector.py → md_padding()` |
+| Simulated Annealing | Metaheuristic optimizer that guesses the secret key length | `detector.py → simulated_annealing_secret_length()` |
+| HMAC-SHA256 | Secure MAC that prevents length extension | `detector.py → secure_sign()` |
+| Random Forest | ML classifier that detects forged contract payloads | `detector.py → train_detector()` |
+| 8-Feature Detection | Payload length, padding byte, entropy, alignment, etc. | `detector.py → extract_features()` |
+
+---
+
+## 🗂️ Project Structure
 
 ```
-src/
-├── 01_length_extension_attack.py   # Module 1: Attack simulation + HMAC defense
-├── 02_hash_anomaly_detector.py     # Module 2: Feature extraction + anomaly detection
-├── 03_metaheuristic_optimizer.py   # Module 3: PSO and GWO threshold optimization
-├── 04_lstm_autoencoder.py          # Module 4: LSTM autoencoder forgery detector
-├── 05_hmm_state_analyzer.py        # Module 5: HMM e-contract state sequence analysis
-├── 06_evaluation_pipeline.py       # Module 6: Full comparative evaluation pipeline
-└── README.md                       # This file
+econtract_security/
+│
+├── app.py                  ← Flask backend (all API routes)
+├── detector.py             ← Core logic: crypto, SA, ML model
+├── requirements.txt        ← Python dependencies
+│
+└── templates/
+    └── index.html          ← Full dark dashboard frontend
 ```
 
 ---
 
-## Module Descriptions
+## ⚙️ How to Run
 
-### Module 1 — Length-Extension Attack (`01_length_extension_attack.py`)
-Demonstrates the structural vulnerability of Merkle-Damgård SHA-256 to
-length-extension attacks in e-contract signing contexts.
-- `EContractForger.sign_contract()` — vulnerable raw SHA-256 signing
-- `EContractForger.perform_extension_attack()` — appends malicious clause
-- `SecureEContractSigner` — HMAC-SHA256 defense (immune to extension)
-
-**Corresponds to:** Section IV.A–B (Mathematical Foundations)
-
----
-
-### Module 2 — Hash Anomaly Detector (`02_hash_anomaly_detector.py`)
-Feature extraction and threshold-based anomaly detection.
-- Shannon entropy, padding entropy, null-byte ratio, block-alignment features
-- `StaticThresholdDetector` — Category B1 (baseline)
-- `EntropyAnomalyDetector` — Category B2c (dynamic, learned thresholds)
-
-**Corresponds to:** Section IV.C, Taxonomy Category B
-
----
-
-### Module 3 — Metaheuristic Optimizer (`03_metaheuristic_optimizer.py`)
-PSO and GWO for detection threshold optimization.
-- Fitness function: `F(θ) = w₁·DR(θ) − w₂·FPR(θ) − w₃·Cost(θ)`
-- `PSOOptimizer` — 30 particles, inertia weight w=0.729, c₁=c₂=1.494
-- `GWOOptimizer` — 30 wolves, α linearly decreasing from 2→0
-
-**Corresponds to:** Section IV.D, Table III (Computational Complexity)
-
----
-
-### Module 4 — LSTM Autoencoder (`04_lstm_autoencoder.py`)
-Unsupervised LSTM autoencoder for forgery detection.
-- Pure NumPy LSTM cell implementation (no PyTorch/TensorFlow)
-- Training: minimize MSE on legitimate contracts only
-- Anomaly score: `score(X) = ||X − Decoder(Encoder(X))||²`
-- Threshold: `μ_legit + k·σ_legit` (k=2.0 default)
-
-**Corresponds to:** Section IV.E, Table II (Rao et al. approach)
-
----
-
-### Module 5 — HMM State Analyzer (`05_hmm_state_analyzer.py`)
-Hidden Markov Model for e-contract workflow anomaly detection.
-- 6 hidden states: DRAFT_SUBMISSION → HASH_COMPUTATION → SIGNATURE →
-  [PAYLOAD_EXTENSION] → VERIFICATION → ARCHIVAL
-- Baum-Welch training (EM algorithm) on legitimate sequences
-- Viterbi decoding for forensic state path reconstruction
-- Anomaly score: log P(O|λ) — lower = more anomalous
-
-**Corresponds to:** Section IV.G, Taxonomy Category B2d
-
----
-
-### Module 6 — Evaluation Pipeline (`06_evaluation_pipeline.py`)
-Unified pipeline running and comparing all detectors.
-- Generates synthetic dataset (500 legitimate + 500 forged contracts)
-- Evaluates: HMAC Verifier, Static Threshold, Entropy Detector,
-  Linear SVM, Random Forest, PSO-Optimized Entropy Detector
-- Outputs DR%, FPR%, Accuracy for each method
-- Demonstrates attack and HMAC defense end-to-end
-
-**Corresponds to:** Section VI (Comparative Analysis), Table II
-
----
-
-## Requirements
-
-```
-python >= 3.8
-numpy >= 1.21
-```
-
-Install:
+### Step 1 — Make sure Python is installed
 ```bash
-pip install numpy
+python --version
+# Should show Python 3.8 or higher
 ```
 
----
-
-## Running the Code
-
-Run any module directly:
+### Step 2 — Install dependencies
 ```bash
-python 01_length_extension_attack.py
-python 02_hash_anomaly_detector.py
-python 03_metaheuristic_optimizer.py
-python 04_lstm_autoencoder.py
-python 05_hmm_state_analyzer.py
-python 06_evaluation_pipeline.py   # Recommended: runs full comparison
+pip install -r requirements.txt
+```
+
+### Step 3 — Run the server
+```bash
+python app.py
+```
+
+### Step 4 — Open in browser
+```
+http://127.0.0.1:5000
 ```
 
 ---
 
-## Key Results (from Module 6)
+## 🖥️ Dashboard Features
 
-| Method                          |  DR%  | FPR%  |  Acc% |
-|---------------------------------|-------|-------|-------|
-| HMAC Verifier (Protocol)        | 100.0 |  1.0  |  99.5 |
-| Static Threshold (B1)           |  ~72  |  ~18  |  ~77  |
-| Entropy Anomaly Detector (B2c)  |  ~91  |  ~4.5 |  ~93  |
-| Linear SVM Classifier (C1)      |  ~94  |  ~3.5 |  ~95  |
-| Random Forest (C1)              |  ~95  |  ~3.2 |  ~96  |
-| PSO-Optimized Entropy (B2c+PSO) |  ~94  |  ~3.0 |  ~96  |
-
-Results confirm the paper's comparative findings (Table II, Section VI).
-
----
-
-## Connection to Paper Taxonomy
-
-```
-Paper Taxonomy Category          Module(s)
-─────────────────────────────────────────────────────────
-A. Protocol-Level Hardening      Module 1 (HMAC defense)
-B1. Static Threshold Methods     Module 2
-B2c. Entropy Analysis            Modules 2, 3, 6
-B2d. HMM State Modeling          Module 5
-C1. Supervised Learning (SVM/RF) Module 6
-C2. Deep Learning (LSTM)         Module 4
-PSO/GWO Optimization             Module 3
-```
+| Page | What It Does |
+|------|-------------|
+| 🏠 Dashboard | System overview, architecture, and how-to-use guide |
+| ✍️ Sign Contract | Sign a message with vulnerable SHA-256 or secure HMAC-SHA256 |
+| ⚠️ Simulate Attack | Launch a length-extension attack using SA to guess secret length |
+| 🔍 Detect Forgery | Run the Random Forest ML model on any payload + tag |
+| ✔️ Verify Contract | Check if a MAC tag is still valid server-side |
+| 🗂️ Taxonomy | View the full hierarchical classification from the survey |
+| 📊 Comparison | View the full comparative table from the survey paper |
 
 ---
 
-## Authors
-Vedanth D , Mursalin Pasha M.
-Department of Computer Science and Engineering 
-JAIN Deemed-to-be University, Bangalore, India  
-Academic Year 2025–2026
+## 📡 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/sign/vulnerable` | Sign with raw SHA-256 (vulnerable) |
+| POST | `/api/sign/secure` | Sign with HMAC-SHA256 (secure) |
+| POST | `/api/attack/length-extension` | Simulate a length-extension attack with SA |
+| POST | `/api/detect` | Run ML forgery detection on a payload |
+| POST | `/api/verify` | Verify a MAC tag server-side |
+| GET  | `/api/stats` | Get model and system statistics |
+
+---
+
+## 📊 ML Model Details
+
+- **Algorithm:** Random Forest (100 estimators)
+- **Training samples:** 1,200 (600 legitimate + 600 forged synthetic)
+- **Features used for detection:**
+
+| # | Feature | Why It Matters |
+|---|---------|---------------|
+| 1 | Payload length | Forged payloads tend to be longer |
+| 2 | Padding byte detected | 0x80 byte indicates MD padding was appended |
+| 3 | Block alignment | Forged payloads align to 64-byte boundaries |
+| 4 | Tag entropy | Forged tags show lower entropy |
+| 5 | Null byte ratio | MD padding contains null bytes |
+| 6 | Length mod 512 | Block structure anomaly detection |
+| 7 | Average byte value | Statistical deviation from legitimate traffic |
+| 8 | Payload entropy | Legitimate payloads have higher randomness |
+
+---
+
+## 🔬 Simulated Annealing in This Project
+
+The SA algorithm is used to **guess the secret key length** without knowing the key itself.
+
+```
+Initialize random secret length guess
+Set temperature T = 100
+
+Repeat 300 iterations:
+    Generate neighbour guess (±1 or ±2)
+    Score guess based on block alignment heuristic
+    If better → accept
+    If worse  → accept with probability exp(ΔScore / T)
+    Reduce T by factor 0.95
+
+Return best guess
+```
+
+This mirrors how a real attacker would use SA to efficiently search for the
+correct secret length before crafting the forged MAC tag.
+
+---
+
+## 📚 Papers Referenced in This Project
+
+| # | Paper | Year | Source |
+|---|-------|------|--------|
+| 1 | Bellare et al. — Keying Hash Functions for Message Authentication | 1996 | CRYPTO |
+| 2 | NIST FIPS 180-4 — Secure Hash Standard | 2015 | NIST |
+| 3 | NIST FIPS 202 — SHA-3 Standard | 2015 | NIST |
+| 4 | Kirkpatrick et al. — Optimization by Simulated Annealing | 1983 | Science |
+| 5 | Goldberg — Genetic Algorithms in Search and Optimization | 1989 | Book |
+| 6 | Kennedy & Eberhart — Particle Swarm Optimization | 1995 | IEEE |
+| 7 | Wikipedia — Length Extension Attack | 2025 | Online |
+| 8 | Frank DENIS — Length-Extension Attacks Are Still a Thing | 2025 | Blog |
+| 9 | Enhancing IDS Using Metaheuristic Algorithms | 2024 | DJES |
+| 10 | Metaheuristic Feature Selection for Cyberattack Detection | 2025 | Scientific Reports |
+| 11 | Comprehensive Review of AI-Driven Detection Techniques | 2024 | Journal of Big Data |
+| 12 | Systematic Review: Metaheuristics for IIoT Attack Detection | 2026 | AI Review |
+
+---
+
+## ⚖️ Legal Frameworks Covered
+
+| Framework | Relevant Sections | What It Means for E-Contract Forgery |
+|-----------|------------------|--------------------------------------|
+| GDPR (EU) | Articles 5, 25, 32 | Organizations must use secure MACs by law |
+| IT Act 2000 (India) | Sections 43, 66, 73, 74 | Hash forgery is a criminal offense |
+| UNCITRAL Model Law | Articles 8, 9, 13 | Forged contracts may be legally void |
+
+---
+
+## 🏫 Academic Context
+
+- **Paper Title:** Cryptographic Forgery in E-Contracts: A Survey of Metaheuristic Length-Extension Attacks
+- **Institution:** JAIN Deemed-to-be University, Bangalore, India
+- **Department:** Computer Science and Engineering
+- **Methodology:** PRISMA Systematic Literature Review
+- **Papers Reviewed:** 54 peer-reviewed publications (2018–2025)
+- **Databases Used:** IEEE Xplore, ACM Digital Library, ScienceDirect
+
+---
+
+## 👥 Team
+
+| Name | Role |
+|------|------|
+| Vedanth D | Research, Implementation, Survey |
+| Mursalin Pasha M | Research, Survey Writing |
+
+---
+
+## 📝 License
+
+This project is for **academic and educational purposes only.**
+The attack simulation is a controlled demonstration — do not use against real systems.
+
+```
+MIT License — Free to use for learning and research
+```
+
+---
+
+## 🙏 Acknowledgements
+
+We acknowledge the use of the following AI tools in the development of this project:
+
+- **Claude by Anthropic** — for all code generation and system implementation
+- **Google Gemini** — for research assistance and paper discovery
+- **ChatGPT by OpenAI** — for survey writing and academic content
+
+> *This project was developed as part of a Cyber Law course at JAIN Deemed-to-be University.*
+
+---
+
+<div align="center">
+  <b>Built with ❤️ at JAIN Deemed-to-be University, Bangalore</b><br/>
+  <i>Cyber Law · Computer Science · Cryptographic Security</i>
+</div>
