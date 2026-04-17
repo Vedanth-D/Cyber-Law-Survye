@@ -272,6 +272,7 @@ correct secret length before crafting the forged MAC tag.
 
 This project is for **academic and educational purposes only.**
 The attack simulation is a controlled demonstration — do not use against real systems.
+This project is licensed under the Apache License 2.0 — see the [LICENSE](LICENSE) file for details.
 
 ```
 MIT License — Free to use for learning and research
@@ -287,11 +288,9 @@ We acknowledge the use of the following AI tools in the development of this proj
 - **Google Gemini** — for research assistance and paper discovery
 - **ChatGPT by OpenAI** — for survey writing and academic content
 
-> *This project was developed as part of a Cyber Law course at JAIN Deemed-to-be University.*
-
 ---
 
 <div align="center">
-  <b>Built with ❤️ at JAIN Deemed-to-be University, Bangalore</b><br/>
+  <b>Built with understanding the cryptography technics.</b><br/>
   <i>Cyber Law · Computer Science · Cryptographic Security</i>
 </div>
