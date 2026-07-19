@@ -1,9 +1,10 @@
 # 🔐 Cryptographic Forgery in E-Contracts
-### A Survey-Based Implementation of Metaheuristic Length-Extension Attack Detection
+### A Survey-Based Implementation of Metaheuristic Length-Extension Attack Detection & Blockchain Anchoring
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python)
 ![Flask](https://img.shields.io/badge/Flask-Backend-black?style=for-the-badge&logo=flask)
-![ML](https://img.shields.io/badge/ML-RandomForest-green?style=for-the-badge&logo=scikit-learn)
+![ML](https://img.shields.io/badge/ML-Dynamic_Studio-green?style=for-the-badge&logo=scikit-learn)
+![Blockchain](https://img.shields.io/badge/Ledger-Anchored-blueviolet?style=for-the-badge&logo=blockchaindotcom)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
@@ -16,10 +17,8 @@ This project is a **full-stack working implementation** based on our survey pape
 > **"Cryptographic Forgery in E-Contracts: A Survey of Metaheuristic Length-Extension Attacks"**
 > Department of Computer Science and Engineering, JAIN Deemed-to-be University, Bangalore, India
 
-The system demonstrates how **hash length-extension attacks** work on electronic contracts,
-how **Simulated Annealing (metaheuristic optimization)** is used to guess secret key lengths,
-and how a **Random Forest ML classifier** detects forged contract payloads — all through a
-dark-themed interactive security dashboard.
+The system demonstrates how **hash length-extension attacks** work on electronic contracts across **MD5, SHA-1, and SHA-256**,
+how **Simulated Annealing (metaheuristic optimization)** is used to guess secret key lengths, and how a multi-layered defense (combining **Random Forest ML classifiers**, **hmac**, and **Proof-of-Work blockchain anchoring**) secures contract payloads — all through a premium dark glassmorphism security dashboard.
 
 ---
 
@@ -29,69 +28,42 @@ This project was built using a combination of AI assistants, each contributing t
 
 ---
 
-### 🟠 Claude (Anthropic) — Code Implementation
-**Used for:** All code generation, system architecture, and full-stack development
+### 🟠 Claude (Anthropic) — Original Implementation
+**Used for:** Initial mock code templates and frontend scaffolding.
 
-Claude was used to write every line of code in this project including:
+---
 
-- `app.py` — Flask backend with all REST API endpoints
-- `detector.py` — Core cryptographic logic, Simulated Annealing optimizer, Random Forest ML model, feature extraction pipeline
-- `templates/index.html` — Complete dark-themed security dashboard frontend with HTML, CSS, and JavaScript
-- Debugging and fixing all runtime errors (405 Method Not Allowed, 500 template errors, CORS issues)
-- Designing the 8-feature ML detection pipeline
-- Writing the SA convergence loop and MD padding calculator
+### 🟢 Google Antigravity (DeepMind) — Core Upgrades & Cryptographic Engine
+**Used for:** Authentic cryptographic engineering, ML Model Studio, and blockchain ledger integration.
 
-> **Claude was the primary coding assistant for this entire project.**
-> Model used: Claude Sonnet (claude.ai)
+Antigravity refactored the project to feature:
+- A functional pure-Python **cryptographic compression engine** performing actual length-extension signature hijacking.
+- An interactive **ML Model Studio** for training multiple classifiers (Random Forest, Decision Tree, Logistic Regression) dynamically on the backend and drawing live ROC and Confusion Matrix SVG charts in the frontend.
+- An in-memory **Proof-of-Work blockchain ledger** that anchors contract hashes, computes Merkle roots, and simulates mining hashes at custom difficulties.
+- A **multi-layered verification console** checking cryptographic signatures, ML anomaly flags, and ledger registration simultaneously.
 
 ---
 
 ### 🔵 Google Gemini — Research Assistance
-**Used for:** Literature search, paper summaries, and content structuring
+**Used for:** Literature search, paper summaries, and content structuring.
 
 Gemini was used to:
-
-- Search and summarize academic papers related to hash length-extension attacks
-- Explain the Merkle–Damgård construction in simple terms
-- Find recent papers (2020–2025) from IEEE, ACM, and ScienceDirect
-- Suggest relevant legal frameworks (GDPR, IT Act 2000, UNCITRAL)
-- Help understand how Simulated Annealing applies to cryptographic search problems
-- Summarize papers that were behind paywalls
-
-> Model used: Gemini 1.5 Pro (gemini.google.com)
+- Search and summarize academic papers related to hash length-extension attacks.
+- Explain the Merkle–Damgård construction in simple terms.
+- Find recent papers (2020–2025) from IEEE, ACM, and ScienceDirect.
+- Suggest relevant legal frameworks (GDPR, IT Act 2000, UNCITRAL).
+- Help understand how Simulated Annealing applies to cryptographic search problems.
 
 ---
 
-### 🟢 ChatGPT (OpenAI) — Survey Paper Writing & Explanation
-**Used for:** Writing sections of the survey paper and explaining concepts
+### 🟣 ChatGPT (OpenAI) — Survey Paper Writing & Explanation
+**Used for:** Writing sections of the survey paper and explaining concepts.
 
 ChatGPT was used to:
-
-- Draft and refine sections of the survey paper (Abstract, Introduction, Problem Statement)
-- Explain cryptographic concepts in plain language for the presentation
-- Suggest the structure of the PRISMA-based literature review
-- Write the comparative analysis narrative for Table II
-- Help phrase the legal-technical mapping section (GDPR Articles, IT Act Sections)
-- Proofread and improve academic writing quality
-
-> Model used: ChatGPT-4o (chat.openai.com)
-
----
-
-### 🟡 Summary of AI Contributions
-
-| Task | Tool Used |
-|------|-----------|
-| All backend Python code | Claude (Anthropic) |
-| All frontend HTML/CSS/JS | Claude (Anthropic) |
-| Bug fixing & debugging | Claude (Anthropic) |
-| System architecture design | Claude (Anthropic) |
-| Literature search & paper summaries | Google Gemini |
-| Finding IEEE/ACM papers | Google Gemini |
-| Survey paper writing | ChatGPT (OpenAI) |
-| Academic language & proofreading | ChatGPT (OpenAI) |
-| Concept explanations for PPT | ChatGPT (OpenAI) |
-| Research topic ideation | All three tools |
+- Draft and refine sections of the survey paper (Abstract, Introduction, Problem Statement).
+- Explain cryptographic concepts in plain language for the presentation.
+- Suggest the structure of the PRISMA-based literature review.
+- Write the comparative analysis narrative for Table II.
 
 ---
 
@@ -102,11 +74,12 @@ ChatGPT was used to:
 | Concept | What It Means | Where in Code |
 |---------|--------------|---------------|
 | Hash Length-Extension Attack | Appending data to a signed contract without knowing the secret key | `detector.py → length_extension_attack()` |
-| Merkle–Damgård Vulnerability | SHA-256/MD5/SHA-1 internal state can be resumed by attacker | `detector.py → md_padding()` |
+| Merkle–Damgård Vulnerability | MD5/SHA-1/SHA-256 internal chaining registers can be resumed by attacker | `detector.py → sha256_compress(), md5_compress(), sha1_compress()` |
 | Simulated Annealing | Metaheuristic optimizer that guesses the secret key length | `detector.py → simulated_annealing_secret_length()` |
-| HMAC-SHA256 | Secure MAC that prevents length extension | `detector.py → secure_sign()` |
-| Random Forest | ML classifier that detects forged contract payloads | `detector.py → train_detector()` |
-| 8-Feature Detection | Payload length, padding byte, entropy, alignment, etc. | `detector.py → extract_features()` |
+| HMAC Double Hashing | Secure MAC nested double-hashing that blocks length extension | `detector.py → secure_sign()` |
+| Random Forest / ML | Classifier that detects hidden padding bytes in forged payloads | `detector.py → train_custom_classifier()` |
+| Blockchain Anchoring | Immutable Proof-of-Work ledger securing signature histories | `app.py → Blockchain Class` |
+| Multi-layered Audit | Unified validation combining signature, ML, and blockchain checks | `app.py → verify()` |
 
 ---
 
@@ -115,12 +88,12 @@ ChatGPT was used to:
 ```
 econtract_security/
 │
-├── app.py                  ← Flask backend (all API routes)
-├── detector.py             ← Core logic: crypto, SA, ML model
+├── app.py                  ← Flask backend (all API routes & Blockchain ledger)
+├── detector.py             ← Core logic: custom crypto compressions, SA, ML models
 ├── requirements.txt        ← Python dependencies
 │
 └── templates/
-    └── index.html          ← Full dark dashboard frontend
+    └── index.html          ← Premium dark glassmorphic UI, SVG charts, visual miners
 ```
 
 ---
@@ -154,13 +127,14 @@ http://127.0.0.1:5000
 
 | Page | What It Does |
 |------|-------------|
-| 🏠 Dashboard | System overview, architecture, and how-to-use guide |
-| ✍️ Sign Contract | Sign a message with vulnerable SHA-256 or secure HMAC-SHA256 |
-| ⚠️ Simulate Attack | Launch a length-extension attack using SA to guess secret length |
-| 🔍 Detect Forgery | Run the Random Forest ML model on any payload + tag |
-| ✔️ Verify Contract | Check if a MAC tag is still valid server-side |
-| 🗂️ Taxonomy | View the full hierarchical classification from the survey |
-| 📊 Comparison | View the full comparative table from the survey paper |
+| 🏠 Dashboard | System overview, active parameters, and interactive guides |
+| ✍️ Sign Contract | Generate vulnerable raw signatures or secure HMACs (MD5, SHA-1, SHA-256) |
+| ⚠️ Attack Sandbox | Launch a cryptographic length-extension exploit using SA guesses |
+| 🔍 Detect Forgery | Scan any transmitted payload for binary padding anomalies |
+| 🧬 ML Model Studio | Train Random Forest, Decision Trees, or Logistic Regression live with SVG plots |
+| ⛓️ Blockchain Ledger | Anchor contract signatures and mine PoW blocks with difficulty adjustments |
+| 🛡️ Verify Console | Check contracts via Signature Match, ML detectors, and Ledger status |
+| 📊 Survey Table | View the full taxonomy map and comparative data from the survey paper |
 
 ---
 
@@ -168,31 +142,35 @@ http://127.0.0.1:5000
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/sign/vulnerable` | Sign with raw SHA-256 (vulnerable) |
-| POST | `/api/sign/secure` | Sign with HMAC-SHA256 (secure) |
-| POST | `/api/attack/length-extension` | Simulate a length-extension attack with SA |
-| POST | `/api/detect` | Run ML forgery detection on a payload |
-| POST | `/api/verify` | Verify a MAC tag server-side |
-| GET  | `/api/stats` | Get model and system statistics |
+| POST | `/api/sign/vulnerable` | Sign message with raw vulnerable hashing |
+| POST | `/api/sign/secure` | Sign message with secure HMAC double-hashing |
+| POST | `/api/attack/length-extension` | Run actual cryptographic length-extension using state reconstruction |
+| POST | `/api/detect` | Run active classifier anomaly check on contract data |
+| POST | `/api/verify` | Perform multi-layered validation (Signature, ML, Blockchain) |
+| POST | `/api/ml/train` | Train a customized ML model with user hyperparameters |
+| POST | `/api/blockchain/anchor` | Submit signature tag to the pending transactions pool |
+| POST | `/api/blockchain/mine` | Run nonce search to mine pending block at set difficulty |
+| GET  | `/api/blockchain/blocks` | List mined blocks chain and transactions |
+| GET  | `/api/stats` | Retrieve classifier and active engine parameters |
 
 ---
 
 ## 📊 ML Model Details
 
-- **Algorithm:** Random Forest (100 estimators)
-- **Training samples:** 1,200 (600 legitimate + 600 forged synthetic)
+- **Classifiers Supported:** Random Forest, Decision Tree, Logistic Regression (scikit-learn)
+- **Training dataset:** 1,200 samples (600 legitimate + 600 forged synthetic contract texts)
 - **Features used for detection:**
 
 | # | Feature | Why It Matters |
 |---|---------|---------------|
-| 1 | Payload length | Forged payloads tend to be longer |
-| 2 | Padding byte detected | 0x80 byte indicates MD padding was appended |
+| 1 | Payload length | Forged payloads tend to be longer due to padding |
+| 2 | Padding byte detected | Presence of 0x80 byte indicates MD padding injection |
 | 3 | Block alignment | Forged payloads align to 64-byte boundaries |
-| 4 | Tag entropy | Forged tags show lower entropy |
-| 5 | Null byte ratio | MD padding contains null bytes |
-| 6 | Length mod 512 | Block structure anomaly detection |
-| 7 | Average byte value | Statistical deviation from legitimate traffic |
-| 8 | Payload entropy | Legitimate payloads have higher randomness |
+| 4 | Tag entropy | Forged tags show statistical randomness deviations |
+| 5 | Null byte ratio | MD padding contains multiple 0x00 null bytes |
+| 6 | Length mod 512 | Block structure byte length anomaly detection |
+| 7 | Average byte value | Average ASCII code shifted by null/padding bytes |
+| 8 | Payload entropy | Legitimate English payloads show higher character diversity |
 
 ---
 
@@ -214,8 +192,7 @@ Repeat 300 iterations:
 Return best guess
 ```
 
-This mirrors how a real attacker would use SA to efficiently search for the
-correct secret length before crafting the forged MAC tag.
+This mirrors how a real attacker would search for the correct secret length before rebuilding the padding bytes and hijacking the hashing chaining variables.
 
 ---
 
@@ -225,16 +202,13 @@ correct secret length before crafting the forged MAC tag.
 |---|-------|------|--------|
 | 1 | Bellare et al. — Keying Hash Functions for Message Authentication | 1996 | CRYPTO |
 | 2 | NIST FIPS 180-4 — Secure Hash Standard | 2015 | NIST |
-| 3 | NIST FIPS 202 — SHA-3 Standard | 2015 | NIST |
-| 4 | Kirkpatrick et al. — Optimization by Simulated Annealing | 1983 | Science |
-| 5 | Goldberg — Genetic Algorithms in Search and Optimization | 1989 | Book |
-| 6 | Kennedy & Eberhart — Particle Swarm Optimization | 1995 | IEEE |
-| 7 | Wikipedia — Length Extension Attack | 2025 | Online |
-| 8 | Frank DENIS — Length-Extension Attacks Are Still a Thing | 2025 | Blog |
-| 9 | Enhancing IDS Using Metaheuristic Algorithms | 2024 | DJES |
-| 10 | Metaheuristic Feature Selection for Cyberattack Detection | 2025 | Scientific Reports |
-| 11 | Comprehensive Review of AI-Driven Detection Techniques | 2024 | Journal of Big Data |
-| 12 | Systematic Review: Metaheuristics for IIoT Attack Detection | 2026 | AI Review |
+| 3 | Kirkpatrick et al. — Optimization by Simulated Annealing | 1983 | Science |
+| 4 | Goldberg — Genetic Algorithms in Search and Optimization | 1989 | Book |
+| 5 | Kennedy & Eberhart — Particle Swarm Optimization | 1995 | IEEE |
+| 6 | Frank DENIS — Length-Extension Attacks Are Still a Thing | 2025 | Blog |
+| 7 | Enhancing IDS Using Metaheuristic Algorithms | 2024 | DJES |
+| 8 | Metaheuristic Feature Selection for Cyberattack Detection | 2025 | Scientific Reports |
+| 9 | Comprehensive Review of AI-Driven Detection Techniques | 2024 | Journal of Big Data |
 
 ---
 
@@ -242,9 +216,9 @@ correct secret length before crafting the forged MAC tag.
 
 | Framework | Relevant Sections | What It Means for E-Contract Forgery |
 |-----------|------------------|--------------------------------------|
-| GDPR (EU) | Articles 5, 25, 32 | Organizations must use secure MACs by law |
-| IT Act 2000 (India) | Sections 43, 66, 73, 74 | Hash forgery is a criminal offense |
-| UNCITRAL Model Law | Articles 8, 9, 13 | Forged contracts may be legally void |
+| GDPR (EU) | Articles 5, 25, 32 | Organizations must use secure MACs (HMAC/SHA3) by design |
+| IT Act 2000 (India) | Sections 43, 66, 73, 74 | Hash/Signature forgery is a criminal cyber offense |
+| UNCITRAL Model Law | Articles 8, 9, 13 | Forged contracts fail integrity checks and are legally void |
 
 ---
 
@@ -272,21 +246,11 @@ correct secret length before crafting the forged MAC tag.
 
 This project is for **academic and educational purposes only.**
 The attack simulation is a controlled demonstration — do not use against real systems.
-This project is licensed under the Apache License 2.0 — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ```
 MIT License — Free to use for learning and research
 ```
-
----
-
-## 🙏 Acknowledgements
-
-We acknowledge the use of the following AI tools in the development of this project:
-
-- **Claude by Anthropic** — for all code generation and system implementation
-- **Google Gemini** — for research assistance and paper discovery
-- **ChatGPT by OpenAI** — for survey writing and academic content
 
 ---
 
