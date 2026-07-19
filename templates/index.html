@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CryptoGuard - Advanced Forgery Detection & Blockchain Anchoring</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg-dark:    #080d16;
+    --bg-card:    rgba(13, 22, 38, 0.7);
+    --border-glow: rgba(6, 182, 212, 0.2);
+    --border-card: rgba(255, 255, 255, 0.08);
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #4b5563;
+    
+    --cyan:       #06b6d4;
+    --cyan-glow:  rgba(6, 182, 212, 0.4);
+    --green:      #10b981;
+    --green-glow: rgba(16, 185, 129, 0.4);
+    --red:        #ef4444;
+    --red-glow:   rgba(239, 68, 68, 0.4);
+    --orange:     #f97316;
+    --orange-glow:rgba(249, 115, 22, 0.4);
+    --purple:     #a855f7;
+    
+    --font-mono:  'Share Tech Mono', monospace;
+    --font-sans:  'Outfit', sans-serif;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.1) 0, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0, transparent 50%);
+  }
+
+  /* Scanline cyber-overlay */
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(6, 182, 212, 0.01) 2px,
+      rgba(6, 182, 212, 0.01) 4px
+    );
+    pointer-events:none;
+    z-index:9999;
+  }
+
+  /* Header */
+  header {
+    background: rgba(8, 13, 22, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-card);
+    padding: 0 2rem;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top:0; z-index:100;
+  }
+
+  .logo {
+    display:flex; align-items:center; gap:14px;
+  }
+
+  .logo-icon {
+    width:42px; height:42px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px;
+    box-shadow: 0 0 20px var(--cyan-glow);
+    animation: rotateLogo 6s linear infinite;
+  }
+
+  @keyframes rotateLogo {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+  }
+
+  .logo-text h1 {
+    font-size:1.4rem; font-weight:700;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing:1px;
+    line-height:1.1;
+  }
+  .logo-text span {
+    font-family: var(--font-mono);
+    font-size:0.68rem; color: var(--text-secondary);
+    letter-spacing:2px; text-transform:uppercase;
+  }
+
+  .header-status {
+    display:flex; align-items:center; gap:1.5rem;
+  }
+
+  .status-dot {
+    display:flex; align-items:center; gap:8px;
+    font-family: var(--font-mono); font-size:0.75rem; color: var(--text-secondary);
+    background: rgba(16, 185, 129, 0.1);
+    padding: 4px 10px; border-radius:12px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  .dot {
+    width:8px; height:8px; border-radius:50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: blink 2s infinite;
+  }
+
+  @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+  /* Navigation Sidebar Layout */
+  .layout {
+    display:grid;
+    grid-template-columns: 240px 1fr;
+    min-height: calc(100vh - 70px);
+  }
+
+  nav {
+    background: rgba(8, 13, 22, 0.5);
+    border-right: 1px solid var(--border-card);
+    padding: 1.5rem 0.75rem;
+    display:flex; flex-direction:column; gap:1.5rem;
+  }
+
+  .nav-group-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding-left: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .nav-item {
+    display:flex; align-items:center; gap:12px;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor:pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size:0.95rem; font-weight:500;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+  }
+
+  .nav-item:hover {
+    background: rgba(6, 182, 212, 0.05);
+    color: var(--cyan);
+    border-color: rgba(6, 182, 212, 0.15);
+  }
+
+  .nav-item.active {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--cyan);
+    border-color: rgba(6, 182, 212, 0.25);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.05);
+  }
+
+  .nav-icon { font-size:1.1rem; width:20px; text-align:center; }
+
+  .nav-divider {
+    height:1px; background: var(--border-card);
+    margin: 0.5rem 0.5rem;
+  }
+
+  /* Main Container */
+  main {
+    padding: 2rem;
+    overflow-y: auto;
+  }
+
+  .page { display:none; animation: fadeIn 0.4s ease-out forwards; }
+  .page.active { display:block; }
+
+  @keyframes fadeIn {
+    from { opacity:0; transform: translateY(8px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+
+  .page-title { margin-bottom:2rem; }
+  .page-title h2 { font-size:1.8rem; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+  .page-title p { color: var(--text-secondary); font-size:0.88rem; font-family: var(--font-mono); }
+
+  /* Dashboard Stats Grid */
+  .stats-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap:1.5rem; margin-bottom:2rem;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius:12px;
+    padding: 1.25rem 1.5rem;
+    backdrop-filter: blur(16px);
+    transition: all 0.3s;
+    position:relative; overflow:hidden;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  }
+
+  .stat-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  }
+  .stat-card.cyan::before { background: var(--cyan); }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.orange::before { background: var(--orange); }
+  .stat-card.purple::before { background: var(--purple); }
+
+  .stat-label { font-family: var(--font-mono); font-size:0.7rem; color: var(--text-secondary); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;}
+  .stat-value { font-size:2.2rem; font-weight:800; line-height:1; margin-bottom:4px; }
+  .stat-card.cyan .stat-value { color: var(--cyan); }
+  .stat-card.green .stat-value { color: var(--green); }
+  .stat-card.orange .stat-value { color: var(--orange); }
+  .stat-card.purple .stat-value { color: var(--purple); }
+  .stat-sub { font-size:0.8rem; color: var(--text-secondary); }
+
+  /* Panels Grid */
+  .grid-2 {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap:1.5rem; margin-bottom:1.5rem;
+  }
+
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius:12px;
+    overflow:hidden;
+    backdrop-filter: blur(16px);
+    margin-bottom: 1.5rem;
+  }
+
+  .panel-head {
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--border-card);
+    padding: 1rem 1.5rem;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+
+  .panel-title {
+    font-size:1rem; font-weight:600; display:flex; align-items:center; gap:8px;
+  }
+
+  .panel-badge {
+    font-family: var(--font-mono); font-size:0.65rem; padding: 2px 8px; border-radius:4px; text-transform:uppercase;
+  }
+  .badge-vuln { background: rgba(239, 68, 68, 0.1); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.2); }
+  .badge-safe { background: rgba(16, 185, 129, 0.1); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.2); }
+  .badge-info { background: rgba(6, 182, 212, 0.1); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.2); }
+  .badge-warn { background: rgba(249, 115, 22, 0.1); color: var(--orange); border: 1px solid rgba(249, 115, 22, 0.2); }
+
+  .panel-body { padding: 1.5rem; }
+
+  /* Input fields */
+  .field { margin-bottom:1.25rem; }
+  label {
+    display:block; font-family: var(--font-mono); font-size:0.75rem; color: var(--text-secondary); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;
+  }
+
+  textarea, select, input[type="text"], input[type="number"] {
+    width:100%; background: rgba(8, 13, 22, 0.6);
+    border: 1px solid var(--border-card);
+    border-radius:8px; color: var(--text-primary);
+    font-family: var(--font-mono); font-size:0.88rem;
+    padding: 0.75rem 1rem; outline:none; transition: all 0.3s;
+  }
+
+  textarea:focus, select:focus, input[type="text"]:focus, input[type="number"]:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+  }
+
+  textarea { min-height:90px; resize:vertical; }
+
+  .select-wrap { position:relative; }
+
+  .radio-group { display:flex; gap:1rem; }
+  .radio-opt {
+    flex:1; display:flex; align-items:center; gap:8px;
+    background: rgba(8, 13, 22, 0.4); border: 1px solid var(--border-card);
+    padding:0.75rem; border-radius:8px; cursor:pointer; transition:all 0.3s;
+    font-size:0.88rem;
+  }
+  .radio-opt:has(input:checked) {
+    border-color: var(--cyan); background: rgba(6, 182, 212, 0.05); color: var(--cyan);
+  }
+  .radio-opt input { accent-color: var(--cyan); }
+
+  /* Buttons */
+  .btn {
+    padding: 0.75rem 1.5rem; border:none; border-radius:8px;
+    font-family: var(--font-sans); font-size:0.92rem; font-weight:600;
+    cursor:pointer; transition:all 0.3s; display:inline-flex; align-items:center; gap:8px;
+    text-transform:uppercase; letter-spacing:0.5px;
+  }
+
+  .btn-cyan {
+    background: linear-gradient(135deg, var(--cyan), #0891b2); color:#080d16;
+    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2);
+  }
+  .btn-cyan:hover { box-shadow: 0 6px 22px rgba(6, 182, 212, 0.4); transform: translateY(-1px); }
+
+  .btn-red {
+    background: linear-gradient(135deg, var(--red), #dc2626); color:#fff;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+  }
+  .btn-red:hover { box-shadow: 0 6px 22px rgba(239, 68, 68, 0.4); transform: translateY(-1px); }
+
+  .btn-green {
+    background: linear-gradient(135deg, var(--green), #059669); color:#080d16;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+  }
+  .btn-green:hover { box-shadow: 0 6px 22px rgba(16, 185, 129, 0.4); transform: translateY(-1px); }
+
+  .btn-outline {
+    background: transparent; border: 1px solid var(--border-card); color: var(--text-primary);
+  }
+  .btn-outline:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--text-secondary); }
+
+  .btn:disabled { opacity:0.4; cursor:not-allowed; transform:none !important; box-shadow:none !important; }
+
+  .btn-row { display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:1rem; }
+
+  /* Output boxes */
+  .output-box {
+    background: rgba(8, 13, 22, 0.8);
+    border: 1px solid var(--border-card);
+    border-radius:8px; padding: 1rem;
+    font-family: var(--font-mono); font-size:0.8rem; line-height:1.6;
+    min-height: 80px; word-break: break-all; white-space: pre-wrap;
+    position:relative; transition: all 0.3s;
+  }
+
+  .output-box.loading::after {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.08), transparent);
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+  .output-box .key { color: var(--cyan); }
+  .output-box .val { color: var(--text-primary); }
+  .output-box .hash-tag { color: var(--orange); }
+  .output-box .good { color: var(--green); font-weight:600; }
+  .output-box .bad { color: var(--red); font-weight:600; }
+  .output-box .warn { color: var(--orange); }
+
+  /* Result Badge Card */
+  .result-status-card {
+    border-radius:8px; padding:1rem 1.25rem; display:flex; align-items:center; gap:12px;
+    font-weight:600; font-size:1rem; border:1px solid; margin-top:1.25rem;
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes slideUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  .result-status-card.safe { background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.2); color: var(--green); }
+  .result-status-card.danger { background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.2); color: var(--red); }
+  .result-status-card.warning { background: rgba(249, 115, 22, 0.08); border-color: rgba(249, 115, 22, 0.2); color: var(--orange); }
+
+  /* Interactive Graph visualizers */
+  .crypto-diagram-wrap {
+    margin-top:1.5rem; background: rgba(8, 13, 22, 0.4); border: 1px solid var(--border-card);
+    border-radius:10px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  }
+  
+  .crypto-blocks {
+    display:flex; align-items:center; gap:0.75rem; width:100%; overflow-x:auto; padding: 1rem 0;
+  }
+  
+  .crypto-block {
+    padding:0.75rem 1rem; border-radius:8px; border:1px solid;
+    font-family: var(--font-mono); font-size:0.75rem; text-align:center; min-width: 140px;
+    background: rgba(8,13,22,0.8); position:relative;
+  }
+  .crypto-block.message { border-color: rgba(255,255,255,0.15); color: var(--text-secondary); }
+  .crypto-block.padding { border-color: var(--orange-glow); color: var(--orange); background: rgba(249,115,22,0.05); }
+  .crypto-block.extension { border-color: var(--red-glow); color: var(--red); background: rgba(239,68,68,0.05); }
+  
+  .block-label { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+  .block-content { font-weight: 600; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; }
+
+  .flow-arrow { font-size:1.2rem; color: var(--text-muted); }
+
+  /* ML Metrics Layout */
+  .metrics-summary {
+    display:grid; grid-template-columns: repeat(4, 1fr); gap:1rem; margin-bottom:1.5rem;
+  }
+  .metric-mini-card {
+    background: rgba(8, 13, 22, 0.4); border: 1px solid var(--border-card);
+    border-radius:8px; padding: 0.75rem 1rem; text-align:center;
+  }
+  .metric-mini-card .val { font-size:1.3rem; font-weight:700; color: var(--cyan); }
+  .metric-mini-card .lbl { font-size:0.7rem; color: var(--text-secondary); text-transform:uppercase; margin-top:2px; }
+
+  .studio-charts {
+    display:grid; grid-template-columns: 1.2fr 1fr; gap:1.5rem; margin-top:1rem;
+  }
+  
+  .chart-box {
+    background: rgba(8, 13, 22, 0.4); border: 1px solid var(--border-card);
+    border-radius:10px; padding:1.25rem; display:flex; flex-direction:column; align-items:center;
+  }
+  
+  .chart-title { font-size:0.85rem; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px; margin-bottom:1rem; align-self: flex-start; }
+
+  /* Feature importance bars */
+  .feat-bar-wrap { width:100%; display:flex; flex-direction:column; gap:0.75rem; }
+  .feat-bar-item { display:flex; flex-direction:column; gap:4px; }
+  .feat-bar-header { display:flex; justify-content:space-between; font-size:0.78rem; font-family:var(--font-mono); }
+  .feat-bar-name { color: var(--text-secondary); }
+  .feat-bar-val { color: var(--cyan); }
+  .feat-bar-track { height:6px; background: rgba(255,255,255,0.05); border-radius:3px; overflow:hidden; }
+  .feat-bar-fill { height:100%; background: linear-gradient(90deg, var(--cyan), var(--purple)); border-radius:3px; width:0; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+
+  /* Confusion Matrix styling */
+  .cm-grid {
+    display:grid; grid-template-columns: 40px 1fr 1fr; grid-template-rows: 40px 1fr 1fr; gap:8px; width:220px; height:220px; margin: 0 auto;
+  }
+  .cm-label-x, .cm-label-y { display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-family: var(--font-mono); color: var(--text-secondary); text-transform:uppercase; }
+  .cm-label-x { grid-row: 1; }
+  .cm-label-y { grid-column: 1; writing-mode: vertical-rl; transform: rotate(180deg); }
+  .cm-cell {
+    border-radius:6px; border: 1px solid var(--border-card); display:flex; flex-direction:column; align-items:center; justify-content:center; font-family: var(--font-mono);
+  }
+  .cm-cell.hit { background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); color: var(--green); }
+  .cm-cell.miss { background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.2); color: var(--red); }
+  .cm-cell-val { font-size:1.2rem; font-weight:700; }
+  .cm-cell-lbl { font-size:0.6rem; text-transform:uppercase; color: var(--text-secondary); margin-top:2px; }
+
+  /* Blockchain Block Explorer cards */
+  .block-chain-scroll {
+    display:flex; gap:1.5rem; overflow-x:auto; padding: 1.5rem 0.5rem; scrollbar-width: thin;
+  }
+  .block-card {
+    min-width: 280px; max-width: 320px; background: rgba(13, 22, 38, 0.95);
+    border: 1px solid var(--border-card); border-radius:12px; padding: 1.25rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4); display:flex; flex-direction:column; gap:0.75rem;
+    transition: all 0.3s; position:relative;
+  }
+  .block-card:hover { transform: translateY(-4px); border-color: var(--cyan); box-shadow: 0 8px 30px rgba(6,182,212,0.15); }
+  .block-card.mining { border-color: var(--orange); animation: borderPulse 1.5s infinite; }
+  @keyframes borderPulse { 0%,100% { border-color: var(--border-card); } 50% { border-color: var(--orange); } }
+
+  .block-header { display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-card); padding-bottom: 6px; }
+  .block-index { font-weight: 700; font-size: 1.1rem; color: var(--cyan); }
+  .block-time { font-size:0.75rem; color: var(--text-secondary); font-family:var(--font-mono); }
+  
+  .block-detail-row { display:flex; flex-direction:column; font-family: var(--font-mono); font-size: 0.72rem; }
+  .block-detail-row .lbl { color: var(--text-secondary); text-transform:uppercase; margin-bottom: 2px; }
+  .block-detail-row .val { text-overflow:ellipsis; overflow:hidden; white-space:nowrap; color: var(--text-primary); }
+
+  .block-txs { border-top:1px dashed var(--border-card); padding-top:6px; max-height:80px; overflow-y:auto; }
+  .block-tx { font-size:0.68rem; font-family:var(--font-mono); color: var(--orange); white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+
+  /* Mining Loader Console */
+  .mining-console {
+    background: #04080e; border: 1px solid rgba(249, 115, 22, 0.3); border-radius:8px;
+    padding:1rem; font-family: var(--font-mono); font-size:0.78rem; color: var(--orange);
+    margin-top:1rem; display:none; flex-direction:column; gap:6px;
+  }
+
+  /* Multi check verify console */
+  .verify-checks { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1.25rem; margin-top:1.5rem; }
+  .verify-check-card {
+    background: rgba(8,13,22,0.6); border:1px solid var(--border-card); border-radius:10px; padding:1.25rem;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .verify-check-card.pass { border-color: rgba(16, 185, 129, 0.2); }
+  .verify-check-card.fail { border-color: rgba(239, 68, 68, 0.2); }
+  .verify-check-card .title { font-weight:600; font-size:0.95rem; }
+  .verify-check-card .status { font-family:var(--font-mono); font-size:0.75rem; font-weight:700; text-transform:uppercase; padding: 2px 8px; border-radius:4px; align-self: flex-start;}
+  .verify-check-card.pass .status { background: rgba(16, 185, 129, 0.1); color:var(--green); }
+  .verify-check-card.fail .status { background: rgba(239, 68, 68, 0.1); color:var(--red); }
+  .verify-check-card .desc { font-size:0.82rem; color: var(--text-secondary); }
+
+  /* Reference taxonomy nodes */
+  .tax-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; }
+  .tax-card { background: rgba(8, 13, 22, 0.5); border: 1px solid var(--border-card); border-radius:10px; overflow:hidden; }
+  .tax-title { padding: 0.75rem 1rem; font-weight:600; font-size:0.92rem; text-align:center; border-bottom: 1px solid var(--border-card); }
+  .tax-title.c1 { background: rgba(6, 182, 212, 0.12); color: var(--cyan); }
+  .tax-title.c2 { background: rgba(16, 185, 129, 0.12); color: var(--green); }
+  .tax-title.c3 { background: rgba(239, 68, 68, 0.12); color: var(--red); }
+  .tax-title.c4 { background: rgba(249, 115, 22, 0.12); color: var(--orange); }
+  .tax-list { padding:1rem; display:flex; flex-direction:column; gap:6px; }
+  .tax-list-item { font-size:0.8rem; color: var(--text-secondary); display:flex; align-items:center; gap:6px; }
+  .tax-list-item::before { content: '◇'; color: var(--text-muted); font-size:0.6rem; }
+
+  /* Comparison table */
+  table { width:100%; border-collapse:collapse; font-size:0.85rem; margin-top:1rem; }
+  th { background: rgba(255,255,255,0.02); color: var(--cyan); font-family: var(--font-mono); font-size:0.72rem; letter-spacing:1px; text-transform:uppercase; padding:0.75rem 1rem; border-bottom: 1px solid var(--border-card); text-align:left; }
+  td { padding:0.75rem 1rem; border-bottom: 1px solid var(--border-card); color: var(--text-secondary); }
+  tr:hover td { background: rgba(255,255,255,0.01); color: var(--text-primary); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width:6px; height:6px; }
+  ::-webkit-scrollbar-track { background: #080d16; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius:3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+
+  /* Spinner */
+  .spinner {
+    display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.2);
+    border-top-color:#fff; border-radius:50%; animation: spin 0.8s linear infinite;
+    vertical-align:middle; margin-right:6px;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  .footer { margin-top:3rem; padding-top:1.5rem; border-top:1px solid var(--border-card); display:flex; justify-content:space-between; font-size:0.72rem; font-family:var(--font-mono); color: var(--text-muted); }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    nav { display:none; }
+    .studio-charts { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🔒</div>
+    <div class="logo-text">
+      <h1>CryptoGuard</h1>
+      <span>Zero-Trust E-Contract Integrity Platform</span>
+    </div>
+  </div>
+  <div class="header-status">
+    <div class="status-dot"><div class="dot"></div> CRYPTO CORE ACTIVE</div>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- SIDEBAR NAVIGATION -->
+  <nav>
+    <div class="nav-group-label">Analysis</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <span class="nav-icon">⬡</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('sign')">
+      <span class="nav-icon">✍</span> Sign Contract
+    </div>
+    <div class="nav-item" onclick="showPage('attack')">
+      <span class="nav-icon">⚡</span> Attack Sandbox
+    </div>
+    <div class="nav-item" onclick="showPage('detect')">
+      <span class="nav-icon">🔍</span> ML Detector
+    </div>
+    <div class="nav-item" onclick="showPage('verify')">
+      <span class="nav-icon">🛡</span> Verify Console
+    </div>
+
+    <div class="nav-divider"></div>
+    <div class="nav-group-label">Defense Engine</div>
+    <div class="nav-item" onclick="showPage('studio')">
+      <span class="nav-icon">🧬</span> ML Model Studio
+    </div>
+    <div class="nav-item" onclick="showPage('blockchain')">
+      <span class="nav-icon">⛓</span> Blockchain Ledger
+    </div>
+
+    <div class="nav-divider"></div>
+    <div class="nav-group-label">Reference</div>
+    <div class="nav-item" onclick="showPage('reference')">
+      <span class="nav-icon">📊</span> Comparative Survey
+    </div>
+  </nav>
+
+  <!-- MAIN VIEWPORT -->
+  <main>
+    
+    <!-- ══ DASHBOARD ══════════════════════════════════════════════════════ -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-title">
+        <h2>⬡ Cyber Security Operations Center</h2>
+        <p>INTEGRITY MONITORING & ML-POWERED TAMPER DETECTION</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card cyan">
+          <div class="stat-label">Model Detection Rate</div>
+          <div class="stat-value" id="stat-det-rate">98.5%</div>
+          <div class="stat-sub">Random Forest (Dynamic)</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Blockchain Blocks</div>
+          <div class="stat-value" id="stat-blocks-count">1</div>
+          <div class="stat-sub">Mined Ledger Height</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-label">Pending Transactions</div>
+          <div class="stat-value" id="stat-pending-tx">0</div>
+          <div class="stat-sub">Unanchored Contracts</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">Reviewed Studies</div>
+          <div class="stat-value">54</div>
+          <div class="stat-sub">PRISMA Literature Filter</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">🛡 Real-Time Architecture</div>
+            <span class="panel-badge badge-info">Zero-Trust Framework</span>
+          </div>
+          <div class="panel-body">
+            <div class="output-box" style="min-height:180px">
+<span class="key">Active Hash Algos:</span> <span class="val">MD5 · SHA-1 · SHA-256</span>
+<span class="key">Attack Target    :</span> <span class="val">Merkle-Damgård Chaining State Injection</span>
+<span class="key">Optimizer        :</span> <span class="val">Metaheuristic Simulated Annealing (SA)</span>
+<span class="key">Active Classifier:</span> <span class="val" id="active-classifier-name">Random Forest</span>
+<span class="key">Ledger Model     :</span> <span class="val">Simulated Distributed Proof-of-Work Chain</span>
+<span class="key">Defense Strategy :</span> <span class="good">Layer 1: HMAC · Layer 2: ML Forgery Detect · Layer 3: Ledger Anchoring</span>
+<span class="key">Framework Compliance:</span> <span class="val">IT Act 2000 Section 3A (Digital Signatures)</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">💡 Defensive Workflow Guide</div>
+          </div>
+          <div class="panel-body">
+            <div class="output-box" style="min-height:180px">
+<span class="warn">1. SIGN CONTRACT  ›</span> <span class="val">Generate vulnerability-prone raw signature hashes.</span>
+<span class="warn">2. LAUNCH ATTACK  ›</span> <span class="val">Simulate key length guessing via SA to forge valid tags.</span>
+<span class="warn">3. MODEL STUDIO  ›</span> <span class="val">Tune parameters, retrain ML classifiers, and view ROC curves.</span>
+<span class="warn">4. ANCHOR LEDGER  ›</span> <span class="val">Submit cryptographic signatures to the ledger & trigger block mining.</span>
+<span class="warn">5. VERIFY CONSOLE ›</span> <span class="val">Examine contract payloads using our multi-layered validation console.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SIGN CONTRACT ═══════════════════════════════════════════════════ -->
+    <div class="page" id="page-sign">
+      <div class="page-title">
+        <h2>✍ Cryptographic Signature Console</h2>
+        <p>GENERATE MESSAGE AUTHENTICATION CODES (MAC) FOR CONTRACT INTEGRITY</p>
+      </div>
+
+      <div class="grid-2">
+        <!-- Input Form -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">✍ Signature Parameters</div>
+          </div>
+          <div class="panel-body">
+            <div class="field">
+              <label>Contract Clause Payload</label>
+              <textarea id="sign-msg" placeholder="e.g., Party A agrees to acquire 1,000 shares of Corporation B for $5,000."></textarea>
+            </div>
+            
+            <div class="field">
+              <label>Chaining Hash Algorithm</label>
+              <select id="sign-algo">
+                <option value="sha256">SHA-256 (Big Endian)</option>
+                <option value="sha1">SHA-1 (Big Endian)</option>
+                <option value="md5">MD5 (Little Endian)</option>
+              </select>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn btn-red" onclick="signContract('vulnerable')">⚠ Raw Hash (Vulnerable)</button>
+              <button class="btn btn-green" onclick="signContract('secure')">🛡 HMAC (Secure)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output Details -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">📜 Cryptographic Output</div>
+          </div>
+          <div class="panel-body">
+            <div class="output-box" id="sign-out">Awaiting signature inputs...</div>
+            <div class="btn-row" id="anchor-btn-row" style="display:none">
+              <button class="btn btn-cyan" onclick="anchorActiveHash()">⛓ Anchor Tag to Blockchain</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ATTACK SANDBOX ══════════════════════════════════════════════════ -->
+    <div class="page" id="page-attack">
+      <div class="page-title">
+        <h2>⚡ Hash State Injection Attack Sandbox</h2>
+        <p>SIMULATE MERKLE-DAMGÅRD LENGTH EXTENSION FORGERY VIA Simulated Annealing</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">⚙ Attack Parameters</div>
+          <span class="panel-badge badge-warn">Exploit Suite</span>
+        </div>
+        <div class="panel-body">
+          <div class="grid-2" style="margin-bottom:0">
+            <div>
+              <div class="field">
+                <label>Hash Algorithm</label>
+                <select id="atk-algo">
+                  <option value="sha256">SHA-256</option>
+                  <option value="sha1">SHA-1</option>
+                  <option value="md5">MD5</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Original MAC Signature (Tag)</label>
+                <input type="text" id="atk-tag" placeholder="Paste signature tag here..."/>
+              </div>
+              <div class="field">
+                <label>Original Payload Message</label>
+                <textarea id="atk-msg" style="min-height:70px" placeholder="Paste the original signed contract message..."></textarea>
+              </div>
+            </div>
+            <div>
+              <div class="field">
+                <label>Malicious Payload Extension Clause</label>
+                <textarea id="atk-ext" style="min-height:70px"> | FORGED CLAUSE: Pay attacker $999,999 from account 4022</textarea>
+              </div>
+              <div class="field">
+                <label>Simulated Annealing Iterations</label>
+                <input type="number" id="atk-sa-iters" value="300" min="50" max="1000"/>
+              </div>
+              <div class="field">
+                <label>Metaheuristic Max Key Length Search Space</label>
+                <input type="number" id="atk-sa-maxlen" value="64" min="8" max="128"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-red" onclick="runAttackExploit()">⚡ Launch Length-Extension Exploit</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="attack-result-panel" style="display:none">
+        <div class="panel-head">
+          <div class="panel-title">☣ Forgery Exploit Report</div>
+        </div>
+        <div class="panel-body">
+          <div class="output-box" id="atk-out" style="margin-bottom:1.5rem">Awaiting exploit execution...</div>
+
+          <div class="chart-title">Simulated Annealing Convergence Monitor</div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap:0.5rem;" id="sa-convergence-grid"></div>
+
+          <!-- Interactive Cryptographic Flow Map -->
+          <div class="crypto-diagram-wrap">
+            <div class="chart-title">Mathematical Chaining State Transition Map</div>
+            <div class="crypto-blocks" id="visual-block-flow"></div>
+            <div style="font-size:0.85rem; color:var(--text-secondary); text-align:center; max-width:650px" id="visual-block-desc"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ML DETECTOR ════════════════════════════════════════════════════ -->
+    <div class="page" id="page-detect">
+      <div class="page-title">
+        <h2>🔍 Machine Learning Forgery Detector</h2>
+        <p>IDENTIFY LENGTH-EXTENSION ARTIFACTS AND PADDING INJECTIONS IN REAL TIME</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">📥 Payload Analysis Input</div>
+          </div>
+          <div class="panel-body">
+            <div class="field">
+              <label>Transmitted Contract Payload (ASCII + Hex Padding)</label>
+              <textarea id="det-payload" placeholder="Paste contract message (e.g. Message\x80\x00...\x00\x00\x01\x00Extension)..."></textarea>
+            </div>
+            <div class="field">
+              <label>Accompanying MAC Tag</label>
+              <input type="text" id="det-tag" placeholder="Paste MAC signature tag..."/>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-cyan" onclick="runMLDetector()">🔍 Analyze Contract Payload</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">📊 ML Classifier Diagnosis</div>
+          </div>
+          <div class="panel-body">
+            <div id="det-status-card"></div>
+            
+            <div style="margin-top:1.5rem; display:none" id="det-prob-bar-wrap">
+              <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-family:var(--font-mono); margin-bottom:6px">
+                <span>Tamper Probability</span>
+                <span id="det-prob-val">0%</span>
+              </div>
+              <div style="height:8px; background:rgba(255,255,255,0.05); border-radius:4px; overflow:hidden">
+                <div id="det-prob-fill" style="height:100%; width:0%; transition: width 0.8s ease-out;"></div>
+              </div>
+            </div>
+
+            <div style="margin-top:1.5rem; display:none" id="det-features-wrap">
+              <div class="chart-title">Extracted Cryptographic Feature Profile</div>
+              <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:0.5rem" id="det-features-grid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ VERIFY CONSOLE ═════════════════════════════════════════════════ -->
+    <div class="page" id="page-verify">
+      <div class="page-title">
+        <h2>🛡 Multi-Layered Integrity Verification Console</h2>
+        <p>ZERO-TRUST EVALUATION: SIGNATURE CHECK, ML DETECTOR, AND BLOCKCHAIN LEDGER CO-PROCESSING</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">🔑 Evaluation Targets</div>
+        </div>
+        <div class="panel-body">
+          <div class="grid-2" style="margin-bottom:0">
+            <div>
+              <div class="field">
+                <label>Contract Message to Verify</label>
+                <textarea id="ver-msg" placeholder="Paste the contract message content..."></textarea>
+              </div>
+              <div class="field">
+                <label>Signature Tag to Verify</label>
+                <input type="text" id="ver-tag" placeholder="Paste the MAC tag signature..."/>
+              </div>
+            </div>
+            <div>
+              <div class="field">
+                <label>Verification Signing Mode</label>
+                <select id="ver-method">
+                  <option value="vulnerable">Raw Hash Verification (Vulnerable)</option>
+                  <option value="secure">HMAC Double Hashing (Secure)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Cryptographic Algorithm</label>
+                <select id="ver-algo">
+                  <option value="sha256">SHA-256</option>
+                  <option value="sha1">SHA-1</option>
+                  <option value="md5">MD5</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-cyan" onclick="runIntegrityVerification()">🛡 Launch Multi-Layer Verification</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="verify-result-panel" style="display:none">
+        <div class="panel-head">
+          <div class="panel-title">🔬 Verification Audit Logs</div>
+        </div>
+        <div class="panel-body">
+          <div id="ver-status-card"></div>
+          
+          <div class="verify-checks">
+            <div class="verify-check-card" id="card-sig">
+              <span class="status">Check Pending</span>
+              <span class="title">Cryptographic Signature Match</span>
+              <span class="desc">Verifies if the signature tag matches the message using the server key. Can be exploited by length extensions.</span>
+            </div>
+            <div class="verify-check-card" id="card-ml">
+              <span class="status">Check Pending</span>
+              <span class="title">ML Forgery Detection Anomaly</span>
+              <span class="desc">Uses our ML classifier to check if the payload contains hidden MD padding and injected string artifacts.</span>
+            </div>
+            <div class="verify-check-card" id="card-ledger">
+              <span class="status">Check Pending</span>
+              <span class="title">Blockchain Anchor Check</span>
+              <span class="desc">Cross-references the signature tag against the mined block hashes of our immutable ledger.</span>
+            </div>
+          </div>
+
+          <div class="output-label" style="margin-top:1.5rem">Verification Audit Stream</div>
+          <div class="output-box" id="ver-out" style="margin-top:0.5rem">Awaiting check logs...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ML MODEL STUDIO ════════════════════════════════════════════════ -->
+    <div class="page" id="page-studio">
+      <div class="page-title">
+        <h2>🧬 Machine Learning Model Studio</h2>
+        <p>TRAIN CLASSIFIERS, TUNE HYPERPARAMETERS, AND COMPARE EVALUATION CHARTS DYNAMICALLY</p>
+      </div>
+
+      <div class="grid-2">
+        <!-- Tuning Form -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">🧬 Model Training Hyperparameters</div>
+          </div>
+          <div class="panel-body">
+            <div class="field">
+              <label>Model Architecture</label>
+              <select id="studio-model-type" onchange="toggleHyperparamInputs()">
+                <option value="rf">Random Forest Classifier</option>
+                <option value="dt">Decision Tree Classifier</option>
+                <option value="lr">Logistic Regression Classifier</option>
+              </select>
+            </div>
+            
+            <div class="field" id="hp-rf-estimators">
+              <label>Estimators (Number of Trees)</label>
+              <input type="number" id="studio-estimators" value="100" min="10" max="500"/>
+            </div>
+
+            <div class="field" id="hp-max-depth">
+              <label>Max Depth of Estimators (Blank for unlimited)</label>
+              <input type="number" id="studio-depth" value="5" min="1" max="50"/>
+            </div>
+
+            <div class="field" id="hp-lr-c" style="display:none">
+              <label>Regularization Strength (Inverse C)</label>
+              <input type="text" id="studio-c" value="1.0"/>
+            </div>
+
+            <div class="field">
+              <label>Test Split Ratio</label>
+              <select id="studio-split">
+                <option value="0.2">80% Train / 20% Test</option>
+                <option value="0.3">70% Train / 30% Test</option>
+                <option value="0.1">90% Train / 10% Test</option>
+              </select>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn btn-cyan" onclick="trainStudioModel()">🧬 Train Classifier</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance Panel -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">📊 Training Diagnostics Report</div>
+          </div>
+          <div class="panel-body">
+            <div class="metrics-summary">
+              <div class="metric-mini-card"><div class="val" id="m-acc">-</div><div class="lbl">Accuracy</div></div>
+              <div class="metric-mini-card"><div class="val" id="m-prec">-</div><div class="lbl">Precision</div></div>
+              <div class="metric-mini-card"><div class="val" id="m-rec">-</div><div class="lbl">Recall</div></div>
+              <div class="metric-mini-card"><div class="val" id="m-f1">-</div><div class="lbl">F1-Score</div></div>
+            </div>
+
+            <div class="studio-charts">
+              <!-- ROC curve SVG -->
+              <div class="chart-box">
+                <div class="chart-title">Receiver Operating Characteristic (ROC)</div>
+                <svg id="roc-chart" viewBox="0 0 200 200" width="160" height="160" style="background:#04080e; border:1px solid rgba(255,255,255,0.05); border-radius:6px;">
+                  <line x1="0" y1="200" x2="200" y2="0" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" stroke-dasharray="3,3"/>
+                  <path id="roc-curve-path" d="" fill="none" stroke="var(--cyan)" stroke-width="2.5"/>
+                  <text x="10" y="190" fill="var(--text-secondary)" font-size="8" font-family="var(--font-mono)">FPR (X) vs TPR (Y)</text>
+                </svg>
+                <div style="font-size:0.7rem; font-family:var(--font-mono); color:var(--text-secondary); margin-top:6px;">AUC-ROC: <span id="m-auc" style="color:var(--cyan); font-weight:700;">-</span></div>
+              </div>
+              
+              <!-- Confusion Matrix -->
+              <div class="chart-box">
+                <div class="chart-title">Confusion Matrix</div>
+                <div class="cm-grid" id="confusion-matrix-grid">
+                  <div class="cm-label-x">Predicted</div><div class="cm-label-y">Actual</div>
+                  <div class="cm-cell hit"><div class="cm-cell-val" id="cm-tn">-</div><div class="cm-cell-lbl">TN</div></div>
+                  <div class="cm-cell miss"><div class="cm-cell-val" id="cm-fp">-</div><div class="cm-cell-lbl">FP</div></div>
+                  <div class="cm-cell miss"><div class="cm-cell-val" id="cm-fn">-</div><div class="cm-cell-lbl">FN</div></div>
+                  <div class="cm-cell hit"><div class="cm-cell-val" id="cm-tp">-</div><div class="cm-cell-lbl">TP</div></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:1.5rem;">
+              <div class="chart-title">Feature Importance Analysis</div>
+              <div class="feat-bar-wrap" id="feature-importance-bars"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ BLOCKCHAIN LEDGER ════════════════════════════════════════════════ -->
+    <div class="page" id="page-blockchain">
+      <div class="page-title">
+        <h2>⛓ Immutable Cryptographic Blockchain Ledger</h2>
+        <p>SIMULATED DISTRIBUTED PROOF-OF-WORK CONSENSUS CHAIN FOR ZERO-TRUST AUDITING</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">⛓ Block Anchoring Pool</div>
+        </div>
+        <div class="panel-body">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <div>
+              <div style="font-size:0.85rem; color:var(--text-secondary);">Currently pending signature hashes in transaction pool:</div>
+              <div id="pending-hashes-list" style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+                <span style="color:var(--text-muted); font-size:0.75rem; font-family:var(--font-mono);">No pending transaction hashes. Sign a contract and anchor it.</span>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <div class="field" style="margin-bottom:0">
+                <label>Difficulty</label>
+                <input type="number" id="mine-difficulty" value="4" min="1" max="6" style="width:70px; padding:0.4rem; text-align:center;"/>
+              </div>
+              <button class="btn btn-green" id="mine-block-btn" onclick="minePendingBlock()" style="padding: 0.6rem 1.2rem;">⛓ Mine Block</button>
+            </div>
+          </div>
+          
+          <div class="mining-console" id="mine-loader">
+            <div>[STATUS] Scanner Initializing...</div>
+            <div>[LOG] Starting Proof-of-Work nonce calculation...</div>
+            <div id="mine-counter" style="font-weight:700;">Nonce: 0 | Current Hash: ffff...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">⛓ Mined Blockchain Explorer</div>
+          <span class="panel-badge badge-safe" id="height-badge">Height: 1</span>
+        </div>
+        <div class="block-chain-scroll" id="blockchain-explorer">
+          <!-- Genesis Block -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ REFERENCE & COMPARISON SURVEY ═══════════════════════════════════ -->
+    <div class="page" id="page-reference">
+      <div class="page-title">
+        <h2>📊 State-of-the-Art Comparative Survey</h2>
+        <p>TAXONOMY & METRICS DRAWN FROM COMPREHENSIVE CYBERSECURITY REVIEWS (54 PAPERS)</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">🗂 Mitigation Taxonomy Map</div>
+        </div>
+        <div class="panel-body">
+          <div class="tax-grid">
+            <div class="tax-card">
+              <div class="tax-title c1">Classical Crypto</div>
+              <div class="tax-list">
+                <div class="tax-list-item">HMAC Hash Doubling</div>
+                <div class="tax-list-item">SHA-3 Sponge Padding</div>
+                <div class="tax-list-item">BLAKE3 Cryptography</div>
+                <div class="tax-list-item">Output Truncation</div>
+              </div>
+            </div>
+            <div class="tax-card">
+              <div class="tax-title c2">Blockchain Anchor</div>
+              <div class="tax-list">
+                <div class="tax-list-item">Block Hash Anchoring</div>
+                <div class="tax-list-item">Immutable Smart Contracts</div>
+                <div class="tax-list-item">Merkle Audit Proofs</div>
+                <div class="tax-list-item">Zero-Knowledge SNARKs</div>
+              </div>
+            </div>
+            <div class="tax-card">
+              <div class="tax-title c3">Machine Learning</div>
+              <div class="tax-list">
+                <div class="tax-list-item">Random Forest Classifier</div>
+                <div class="tax-list-item">LSTM Network Profiling</div>
+                <div class="tax-list-item">SVM Decision Boundary</div>
+                <div class="tax-list-item">Autoencoder Anomalies</div>
+              </div>
+            </div>
+            <div class="tax-card">
+              <div class="tax-title c4">Metaheuristics</div>
+              <div class="tax-list">
+                <div class="tax-list-item">Simulated Annealing Search</div>
+                <div class="tax-list-item">Genetic Algorithm Optimization</div>
+                <div class="tax-list-item">Particle Swarm Exploration</div>
+                <div class="tax-list-item">SA + ML Hybrid Detectors</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">📊 FDR / FAR / Computation Costs Comparison Table</div>
+        </div>
+        <div class="panel-body" style="padding:0; overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Study / Publication</th><th>Methodology</th><th>FDR %</th><th>FAR %</th><th>Comp. Cost</th><th>Tested Cryptography</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Ahmed et al. (2022)</td><td>HMAC-SHA256 + LSTM</td><td style="color:var(--green); font-weight:600;">96.8%</td><td style="color:var(--green)">2.1%</td><td style="color:var(--cyan)">MEDIUM</td><td>SHA-256</td></tr>
+              <tr><td>Zhang et al. (2020)</td><td>Blockchain Hash Anchoring</td><td style="color:var(--green); font-weight:600;">99.1%</td><td style="color:var(--green)">0.4%</td><td style="color:var(--red)">VERY HIGH</td><td>Keccak / SHA-3</td></tr>
+              <tr><td>Hassan et al. (2023)</td><td>SA Parameter Optimization</td><td style="color:var(--green); font-weight:600;">95.8%</td><td style="color:var(--green)">2.3%</td><td style="color:var(--green)">LOW</td><td>SHA-256</td></tr>
+              <tr><td>Kumar et al. (2023)</td><td>Random Forest Classifier</td><td style="color:var(--green); font-weight:600;">95.4%</td><td style="color:var(--orange)">3.2%</td><td style="color:var(--cyan)">MEDIUM</td><td>SHA-1</td></tr>
+              <tr><td>Lee &amp; Park (2024)</td><td>Genetic + LSTM Hybrid</td><td style="color:var(--green); font-weight:600;">97.6%</td><td style="color:var(--green)">1.8%</td><td style="color:var(--red)">HIGH</td><td>SHA-256</td></tr>
+              <tr><td>Liu et al. (2022)</td><td>Zero-Knowledge proofs</td><td style="color:var(--green); font-weight:600;">100.0%</td><td style="color:var(--green)">0.0%</td><td style="color:var(--red)">EXTREME</td><td>Sponge Functions</td></tr>
+              <tr><td>Patel et al. (2020)</td><td>Entropy + Decision Trees</td><td style="color:var(--orange)">89.3%</td><td style="color:var(--red)">5.9%</td><td style="color:var(--green)">LOW</td><td>MD5</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div>CRYPTOGUARD SECURE PLATFORM · VERSION 2.0</div>
+      <div>COMPLIANT WITH UNCITRAL MODEL LAW ON ELECTRONIC SIGNATURES</div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// Global Cache of last generated hash/tag details
+let lastSignedDetails = null;
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  
+  // Find nav-item matching onclick showPage(id)
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(n => {
+    if (n.getAttribute('onclick').includes(`'${id}'`)) {
+      n.classList.add('active');
+    }
+  });
+
+  // Load relevant dynamic assets
+  if (id === 'blockchain') {
+    fetchBlockchainBlocks();
+  }
+}
+
+// ── API Helper ────────────────────────────────────────────────────────────────
+async function api(endpoint, body = {}) {
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Server request failed');
+  }
+  return res.json();
+}
+
+function fmt(obj) {
+  return Object.entries(obj)
+    .map(([k, v]) => {
+      const valStr = typeof v === 'object' ? JSON.stringify(v, null, 2) : String(v);
+      const cls = String(v).includes('Secure') || v === true || String(v).includes('VALID') ? 'good'
+                : String(v).includes('Vulnerable') || String(v).includes('TAMPERED') || String(v).includes('SUSPICIOUS') ? 'bad'
+                : k.includes('tag') || k.includes('hash') ? 'hash-tag'
+                : 'val';
+      return `<span class="key">${k.padEnd(26)}:</span> <span class="${cls}">${valStr}</span>`;
+    }).join('\n');
+}
+
+function setBox(id, html) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.remove('loading');
+    el.innerHTML = html;
+  }
+}
+
+function setLoading(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.add('loading');
+    el.innerHTML = '<span style="color:var(--text-muted)">Querying Core Engines...</span>';
+  }
+}
+
+// ── Sign Contract ─────────────────────────────────────────────────────────────
+async function signContract(mode) {
+  const msg = document.getElementById('sign-msg').value.trim();
+  const algo = document.getElementById('sign-algo').value;
+  if (!msg) { alert('Please enter contract clause payload'); return; }
+  
+  setLoading('sign-out');
+  const endpoint = `/api/sign/${mode}`;
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, algo: algo })
+    });
+    if (!res.ok) throw new Error('Server returned ' + res.status);
+    const d = await res.json();
+    
+    // Save to Cache
+    lastSignedDetails = {
+      message: d.message,
+      tag: d.tag,
+      algo: algo,
+      mode: mode
+    };
+
+    setBox('sign-out',
+      `<span class="key">Signing Scheme:</span> <span class="${mode === 'secure' ? 'good' : 'bad'}">${d.method}</span>\n` +
+      `<span class="key">Payload Message:</span> <span class="val">${d.message}</span>\n` +
+      `<span class="key">Chaining Hash  :</span> <span class="hash-tag">${d.tag}</span>\n` +
+      `<span class="key">Status Warnings:</span> <span class="${mode === 'secure' ? 'good' : 'bad'}">${d.info || d.warning}</span>`
+    );
+
+    // Show Anchor button
+    document.getElementById('anchor-btn-row').style.display = 'block';
+
+    // Auto-populate attacksandbox targets
+    document.getElementById('atk-algo').value = algo;
+    document.getElementById('atk-tag').value = d.tag;
+    document.getElementById('atk-msg').value = d.message;
+
+    // Auto-populate detect targets
+    document.getElementById('det-payload').value = d.message;
+    document.getElementById('det-tag').value = d.tag;
+
+    // Auto-populate verify targets
+    document.getElementById('ver-msg').value = d.message;
+    document.getElementById('ver-tag').value = d.tag;
+    document.getElementById('ver-method').value = mode;
+    document.getElementById('ver-algo').value = algo;
+
+  } catch (err) {
+    setBox('sign-out', `<span class="bad">CRYPTOGRAPHY RUNTIME ERROR: ${err.message}</span>`);
+  }
+}
+
+// ── Anchor Signature Hash to Blockchain ──────────────────────────────────────
+async function anchorActiveHash() {
+  if (!lastSignedDetails) { alert('No active signed contract to anchor.'); return; }
+  try {
+    const d = await api('/api/blockchain/anchor', { tag: lastSignedDetails.tag });
+    alert(d.message);
+    fetchBlockchainBlocks();
+  } catch (err) {
+    alert('Anchoring failed: ' + err.message);
+  }
+}
+
+// ── Launch Attack Sandbox ────────────────────────────────────────────────────
+async function runAttackExploit() {
+  const algo = document.getElementById('atk-algo').value;
+  const tag = document.getElementById('atk-tag').value.trim();
+  const msg = document.getElementById('atk-msg').value.trim();
+  const ext = document.getElementById('atk-ext').value;
+  const saIters = document.getElementById('atk-sa-iters').value;
+  const saMaxLen = document.getElementById('atk-sa-maxlen').value;
+
+  if (!tag || !msg) { alert('Original Signature Tag and Payload Message are required'); return; }
+
+  setLoading('atk-out');
+  document.getElementById('attack-result-panel').style.display = 'block';
+  document.getElementById('sa-convergence-grid').innerHTML = '<div style="color:var(--orange)">SA Heuristic solver cooling...</div>';
+
+  try {
+    const d = await api('/api/attack/length-extension', {
+      algo: algo,
+      tag: tag,
+      message: msg,
+      extension: ext,
+      sa_iterations: parseInt(saIters),
+      sa_max_len: parseInt(saMaxLen)
+    });
+
+    setBox('atk-out', fmt({
+      exploit_type: d.attack,
+      chosen_algorithm: d.algo,
+      input_signature: d.original_tag,
+      sa_guessed_key_length: d.sa_guessed_secret_length,
+      calculated_padding_bytes: d.md_padding_hex,
+      injected_extension_clause: d.extension_appended,
+      forged_mathematical_tag: d.forged_tag,
+      exploit_verdict: d.result
+    }));
+
+    // SA Convergence logs display
+    const logEl = document.getElementById('sa-convergence-grid');
+    logEl.innerHTML = '';
+    if (d.sa_convergence_log) {
+      d.sa_convergence_log.forEach(e => {
+        logEl.innerHTML += `<div style="background:rgba(8,13,22,0.6); border:1px solid rgba(249,115,22,0.15); border-radius:6px; padding: 6px 10px; font-family:var(--font-mono); font-size:0.72rem; color:var(--text-secondary)">
+          Iter <span style="color:var(--orange)">${e.iteration}</span><br/>
+          Temp <span style="color:var(--orange)">${e.temperature}</span><br/>
+          Guess <span style="color:var(--orange)">${e.current_guess} Bytes</span>
+        </div>`;
+      });
+    }
+
+    // Dynamic Diagram building
+    const flowEl = document.getElementById('visual-block-flow');
+    const descEl = document.getElementById('visual-block-desc');
+    flowEl.innerHTML = '';
+    
+    // Add components to layout flow
+    flowEl.innerHTML += `<div class="crypto-block message"><div class="block-label">Secret Key</div><div class="block-content">Length ${d.sa_guessed_secret_length} B (Hidden)</div></div>`;
+    flowEl.innerHTML += `<div class="flow-arrow">➔</div>`;
+    flowEl.innerHTML += `<div class="crypto-block message"><div class="block-label">Original Msg</div><div class="block-content">${msg.substring(0, 15)}...</div></div>`;
+    flowEl.innerHTML += `<div class="flow-arrow">➔</div>`;
+    flowEl.innerHTML += `<div class="crypto-block padding"><div class="block-label">Merkle Padding</div><div class="block-content">${d.md_padding_hex}</div></div>`;
+    flowEl.innerHTML += `<div class="flow-arrow">➔</div>`;
+    flowEl.innerHTML += `<div class="crypto-block extension"><div class="block-label">Injected Ext</div><div class="block-content">${ext.substring(0,18)}...</div></div>`;
+    flowEl.innerHTML += `<div class="flow-arrow">➔</div>`;
+    
+    flowEl.innerHTML += `<div class="crypto-block" style="border-color:var(--purple); color:var(--purple); background:rgba(168,85,247,0.05)"><div class="block-label">Forged Tag</div><div class="block-content" style="font-weight:700">${d.forged_tag.substring(0, 8)}...</div></div>`;
+
+    descEl.innerHTML = `<strong>Attack vector anatomy:</strong> The client submits the forged payload containing the raw block padding injected. The server computes the hash from scratch: <code>H(key || msg || padding || ext)</code>. The attacker resumes from the state register of <code>H(key || msg)</code> (the original signature tag) to digest the <code>ext</code> block directly. Thus, the forged signature tag matches the server calculation perfectly!`;
+
+    // Cache the forged outputs to verify console
+    document.getElementById('ver-msg').value = d.forged_message_display;
+    document.getElementById('ver-tag').value = d.forged_tag;
+
+    // Auto-update stats count
+    fetchBlockchainBlocks();
+
+  } catch (err) {
+    setBox('atk-out', `<span class="bad">EXPLOIT sandbox FAILURE: ${err.message}</span>`);
+  }
+}
+
+// ── Run ML Detector ──────────────────────────────────────────────────────────
+async function runMLDetector() {
+  const payload = document.getElementById('det-payload').value.trim();
+  const tag = document.getElementById('det-tag').value.trim();
+  
+  if (!payload || !tag) { alert('Both payload and tag signature are required'); return; }
+
+  const card = document.getElementById('det-status-card');
+  card.className = 'result-status-card warning';
+  card.innerHTML = '<span class="spinner"></span> Running Feature Classifier...';
+  
+  document.getElementById('det-prob-bar-wrap').style.display = 'none';
+  document.getElementById('det-features-wrap').style.display = 'none';
+
+  try {
+    const d = await api('/api/detect', { payload: payload, tag: tag });
+
+    if (d.is_forged) {
+      card.className = 'result-status-card danger';
+      card.innerHTML = `🚨 CLASS DETECTED: Tampered Forgery (${d.confidence}% Confidence)`;
+    } else {
+      card.className = 'result-status-card safe';
+      card.innerHTML = `✅ CLASS DETECTED: Legitimate payload (${d.confidence}% Confidence)`;
+    }
+
+    // Probability bar
+    document.getElementById('det-prob-bar-wrap').style.display = 'block';
+    document.getElementById('det-prob-val').textContent = d.forgery_probability + '%';
+    const fillEl = document.getElementById('det-prob-fill');
+    setTimeout(() => {
+      fillEl.style.width = d.forgery_probability + '%';
+      fillEl.style.background = d.is_forged ? 'var(--red)' : 'var(--green)';
+    }, 50);
+
+    // Feature chips grid
+    const featGrid = document.getElementById('det-features-grid');
+    featGrid.innerHTML = '';
+    document.getElementById('det-features-wrap').style.display = 'block';
+    
+    Object.entries(d.features).forEach(([k, v]) => {
+      const ispadding = k === 'padding_byte_detected';
+      const isratio = k === 'null_byte_ratio';
+      const valdisp = typeof v === 'boolean' ? (v ? 'YES (Tamper Risk)' : 'NO (Normal)') : v;
+      const colorCls = (ispadding && v) || (isratio && v > 0.05) ? 'color:var(--red); font-weight:700;' : 'color:var(--cyan);';
+      
+      featGrid.innerHTML += `<div style="background:rgba(8,13,22,0.6); border:1px solid var(--border-card); border-radius:6px; padding: 6px 10px; font-family:var(--font-mono); font-size:0.75rem;">
+        <div style="color:var(--text-secondary); text-transform:uppercase; font-size:0.6rem; margin-bottom:2px;">${k.replace(/_/g,' ')}</div>
+        <div style="${colorCls}">${valdisp}</div>
+      </div>`;
+    });
+
+  } catch (err) {
+    card.className = 'result-status-card danger';
+    card.innerHTML = 'Detector Error: ' + err.message;
+  }
+}
+
+// ── Run Integrity Verification ───────────────────────────────────────────────
+async function runIntegrityVerification() {
+  const msg = document.getElementById('ver-msg').value.trim();
+  const tag = document.getElementById('ver-tag').value.trim();
+  const method = document.getElementById('ver-method').value;
+  const algo = document.getElementById('ver-algo').value;
+
+  if (!msg || !tag) { alert('Contract message and signature tag are required'); return; }
+
+  setLoading('ver-out');
+  document.getElementById('verify-result-panel').style.display = 'block';
+
+  try {
+    const d = await api('/api/verify', { message: msg, tag: tag, method: method, algo: algo });
+    
+    // Set Verdict Card
+    const card = document.getElementById('ver-status-card');
+    const isTampered = d.verdict.includes('TAMPERED') || d.verdict.includes('SUSPICIOUS') || d.verdict.includes('INVALID');
+    
+    if (d.verdict === 'VALID CONTRACT') {
+      card.className = 'result-status-card safe';
+      card.innerHTML = `✅ INTERMEDIATE VERDICT: ${d.verdict}`;
+    } else if (isTampered && d.crypto_valid) {
+      card.className = 'result-status-card warning';
+      card.innerHTML = `🚨 INTERMEDIATE VERDICT: ${d.verdict}`;
+    } else {
+      card.className = 'result-status-card danger';
+      card.innerHTML = `🚨 INTERMEDIATE VERDICT: ${d.verdict}`;
+    }
+
+    // Set 3 check Cards
+    const cSig = document.getElementById('card-sig');
+    const cMl = document.getElementById('card-ml');
+    const cLedger = document.getElementById('card-ledger');
+
+    if (d.crypto_valid) {
+      cSig.className = 'verify-check-card pass';
+      cSig.querySelector('.status').textContent = 'Valid Match';
+    } else {
+      cSig.className = 'verify-check-card fail';
+      cSig.querySelector('.status').textContent = 'Signature Mismatch';
+    }
+
+    if (d.ml_forged) {
+      cMl.className = 'verify-check-card fail';
+      cMl.querySelector('.status').textContent = 'tamper Flagged';
+    } else {
+      cMl.className = 'verify-check-card pass';
+      cMl.querySelector('.status').textContent = 'Legitimate Profile';
+    }
+
+    if (d.blockchain_anchored) {
+      cLedger.className = 'verify-check-card pass';
+      cLedger.querySelector('.status').textContent = 'Anchored Mined';
+    } else {
+      cLedger.className = 'verify-check-card fail';
+      cLedger.querySelector('.status').textContent = 'Unanchored / Missing';
+    }
+
+    setBox('ver-out', fmt({
+      selected_verification_mode: d.method,
+      hashing_algorithm: d.algo,
+      signature_check_match: d.crypto_valid,
+      ml_heuristic_tamper_flag: d.ml_forged,
+      blockchain_ledger_anchor_flag: d.blockchain_anchored,
+      submitted_signature_tag: d.submitted_tag,
+      expected_signature_tag: d.expected_tag,
+      final_audit_verdict: d.verdict
+    }));
+
+  } catch (err) {
+    setBox('ver-out', `<span class="bad">VERIFICATION CONSOLE EXHAUSTION: ${err.message}</span>`);
+  }
+}
+
+// ── ML Model Studio ──────────────────────────────────────────────────────────
+function toggleHyperparamInputs() {
+  const type = document.getElementById('studio-model-type').value;
+  document.getElementById('hp-rf-estimators').style.display = type === 'rf' ? 'block' : 'none';
+  document.getElementById('hp-max-depth').style.display = type !== 'lr' ? 'block' : 'none';
+  document.getElementById('hp-lr-c').style.display = type === 'lr' ? 'block' : 'none';
+}
+
+async function trainStudioModel() {
+  const type = document.getElementById('studio-model-type').value;
+  const split = document.getElementById('studio-split').value;
+  
+  const hparams = {
+    test_split: parseFloat(split)
+  };
+  
+  if (type === 'rf') {
+    hparams.n_estimators = document.getElementById('studio-estimators').value;
+    hparams.max_depth = document.getElementById('studio-depth').value ? parseInt(document.getElementById('studio-depth').value) : null;
+  } else if (type === 'dt') {
+    hparams.max_depth = document.getElementById('studio-depth').value ? parseInt(document.getElementById('studio-depth').value) : null;
+  } else if (type === 'lr') {
+    hparams.C = document.getElementById('studio-c').value;
+  }
+
+  // Loaders
+  document.getElementById('m-acc').textContent = '...';
+  document.getElementById('m-prec').textContent = '...';
+  document.getElementById('m-rec').textContent = '...';
+  document.getElementById('m-f1').textContent = '...';
+
+  try {
+    const d = await api('/api/ml/train', { model_type: type, hyperparams: hparams });
+    
+    // Set stats info
+    document.getElementById('m-acc').textContent = d.accuracy + '%';
+    document.getElementById('m-prec').textContent = d.precision + '%';
+    document.getElementById('m-rec').textContent = d.recall + '%';
+    document.getElementById('m-f1').textContent = d.f1_score + '%';
+    document.getElementById('m-auc').textContent = d.auc;
+
+    // Update operational dashboard stat
+    document.getElementById('stat-det-rate').textContent = d.accuracy + '%';
+    const typeLabelMap = {'rf': 'Random Forest', 'dt': 'Decision Tree', 'lr': 'Logistic Reg.'};
+    document.getElementById('active-classifier-name').textContent = typeLabelMap[type] + ' Classifier';
+
+    // Confusion Matrix cell tags
+    document.getElementById('cm-tn').textContent = d.confusion_matrix.tn;
+    document.getElementById('cm-fp').textContent = d.confusion_matrix.fp;
+    document.getElementById('cm-fn').textContent = d.confusion_matrix.fn;
+    document.getElementById('cm-tp').textContent = d.confusion_matrix.tp;
+
+    // Feature importances rendering
+    const barsEl = document.getElementById('feature-importance-bars');
+    barsEl.innerHTML = '';
+    
+    // Sort features by importance values
+    const sortedFeatures = Object.entries(d.feature_importances).sort((a,b) => b[1] - a[1]);
+    
+    sortedFeatures.forEach(([name, val]) => {
+      const percentage = (val * 100).toFixed(2);
+      barsEl.innerHTML += `<div class="feat-bar-item">
+        <div class="feat-bar-header">
+          <span class="feat-bar-name">${name.replace(/_/g,' ')}</span>
+          <span class="feat-bar-val">${percentage}%</span>
+        </div>
+        <div class="feat-bar-track">
+          <div class="feat-bar-fill" style="width: ${percentage}%"></div>
+        </div>
+      </div>`;
+    });
+
+    // Render ROC path coordinates inside SVG grid
+    const pathEl = document.getElementById('roc-curve-path');
+    let pathD = 'M 0 200'; // start at bottom left (FPR=0, TPR=0)
+    
+    if (d.roc_curve && d.roc_curve.length > 0) {
+      d.roc_curve.forEach(pt => {
+        // Map 0-1 range to 0-200 SVG canvas bounds
+        const x = pt.fpr * 200;
+        const y = 200 - (pt.tpr * 200); // invert Y since SVG 0 is top
+        pathD += ` L ${x} ${y}`;
+      });
+    }
+    pathEl.setAttribute('d', pathD);
+
+  } catch (err) {
+    alert('Training Failed: ' + err.message);
+  }
+}
+
+// ── Blockchain Ledger Functions ──────────────────────────────────────────────
+async function fetchBlockchainBlocks() {
+  try {
+    const res = await fetch('/api/blockchain/blocks');
+    if (!res.ok) throw new Error('Query error');
+    const d = await res.json();
+
+    // Stats
+    document.getElementById('stat-blocks-count').textContent = d.chain.length;
+    document.getElementById('stat-pending-tx').textContent = d.pending_transactions.length;
+    document.getElementById('height-badge').textContent = 'Height: ' + d.chain.length;
+
+    // Mined Blocks
+    const chainEl = document.getElementById('blockchain-explorer');
+    chainEl.innerHTML = '';
+    
+    d.chain.forEach(blk => {
+      let txsHtml = '';
+      if (blk.transactions && blk.transactions.length > 0) {
+        blk.transactions.forEach(tx => {
+          txsHtml += `<div class="block-tx" title="${tx}">TX: ${tx.substring(0,24)}...</div>`;
+        });
+      } else {
+        txsHtml = '<div style="color:var(--text-muted); font-size:0.65rem; font-style:italic;">Genesis / No anchors</div>';
+      }
+
+      chainEl.innerHTML += `<div class="block-card">
+        <div class="block-header">
+          <span class="block-index">Block #${blk.index}</span>
+          <span class="block-time">${blk.timestamp}</span>
+        </div>
+        <div class="block-detail-row">
+          <span class="lbl">Block Hash</span>
+          <span class="val" title="${blk.hash}" style="color:var(--cyan); font-weight:700;">${blk.hash.substring(0, 24)}...</span>
+        </div>
+        <div class="block-detail-row">
+          <span class="lbl">Previous Hash</span>
+          <span class="val" title="${blk.previous_hash}">${blk.previous_hash.substring(0, 24)}...</span>
+        </div>
+        <div class="block-detail-row">
+          <span class="lbl">Merkle Root</span>
+          <span class="val" title="${blk.merkle_root}">${blk.merkle_root.substring(0, 24)}...</span>
+        </div>
+        <div class="block-detail-row" style="display:flex; flex-direction:row; justify-content:space-between;">
+          <div>
+            <span class="lbl">Nonce</span>
+            <span class="val">${blk.nonce}</span>
+          </div>
+          <div>
+            <span class="lbl">Txs Count</span>
+            <span class="val" style="color:var(--orange)">${blk.transactions.length} Mined</span>
+          </div>
+        </div>
+        <div class="block-txs">
+          <div class="lbl" style="font-size:0.65rem; color:var(--text-secondary); margin-bottom:4px; font-family:var(--font-mono)">Anchored Signatures</div>
+          ${txsHtml}
+        </div>
+      </div>`;
+    });
+
+    // Pending transaction tags pool
+    const pendingEl = document.getElementById('pending-hashes-list');
+    pendingEl.innerHTML = '';
+    if (d.pending_transactions && d.pending_transactions.length > 0) {
+      d.pending_transactions.forEach(tx => {
+        pendingEl.innerHTML += `<span style="background:rgba(249,115,22,0.1); border:1px solid rgba(249,115,22,0.25); border-radius:4px; padding:2px 8px; font-family:var(--font-mono); font-size:0.75rem; color:var(--orange)">
+          ${tx.substring(0, 16)}...
+        </span>`;
+      });
+    } else {
+      pendingEl.innerHTML = '<span style="color:var(--text-muted); font-size:0.75rem; font-family:var(--font-mono);">No pending transaction hashes. Sign a contract and anchor it.</span>';
+    }
+
+  } catch (err) {
+    console.error('Ledger fetch failed: ', err);
+  }
+}
+
+async function minePendingBlock() {
+  const difficulty = document.getElementById('mine-difficulty').value;
+  
+  const consoleEl = document.getElementById('mine-loader');
+  const countEl = document.getElementById('mine-counter');
+  const mineBtn = document.getElementById('mine-block-btn');
+  
+  consoleEl.style.display = 'flex';
+  mineBtn.disabled = true;
+
+  // Run a rapid UI counter simulation to show hashing loops
+  let nonceSim = 0;
+  const simInterval = setInterval(() => {
+    nonceSim += Math.floor(Math.random() * 850) + 120;
+    countEl.textContent = `Nonce Scan: ${nonceSim} | Current Hash candidate: 000${Math.random().toString(16).substring(2,18)}...`;
+  }, 60);
+
+  try {
+    const d = await api('/api/blockchain/mine', { difficulty: parseInt(difficulty) });
+    clearInterval(simInterval);
+    
+    countEl.innerHTML = `[SUCCESS] Block Mined! Nonce: <span style="color:var(--green)">${d.block.nonce}</span> | Mined Hash: <span style="color:var(--green)">${d.block.hash.substring(0,32)}...</span> in ${d.mining_time_seconds}s`;
+    
+    setTimeout(() => {
+      consoleEl.style.display = 'none';
+      mineBtn.disabled = false;
+      fetchBlockchainBlocks();
+    }, 2000);
+
+  } catch (err) {
+    clearInterval(simInterval);
+    alert('Mining failed: ' + err.message);
+    consoleEl.style.display = 'none';
+    mineBtn.disabled = false;
+  }
+}
+
+// Initialize components on load
+window.addEventListener('DOMContentLoaded', () => {
+  toggleHyperparamInputs();
+  trainStudioModel(); // auto-train rf at startup
+});
+</script>
+</body>
+</html>
